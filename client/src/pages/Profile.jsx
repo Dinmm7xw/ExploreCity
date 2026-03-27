@@ -200,7 +200,7 @@ function Profile() {
             <div style={{ width: '130px', minWidth: '130px', maxWidth: '130px', flexShrink: 0, padding: '15px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#fafafa', boxSizing: 'border-box' }}>
               <div className="qr-code-box" style={{ width: '82px', height: '82px', padding: '5px', background: 'white', border: '1px solid #eee', borderRadius: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', boxSizing: 'border-box' }}>
                 <QRCodeSVG 
-                  value={`${import.meta.env.VITE_BASE_URL || 'http://localhost:3000'}/check-ticket?id=${tk.ticket_id}&user=${user.id}`} 
+                  value={`${window.location.origin}/check-ticket?id=${tk.ticket_id}&user=${user.id}`} 
                   size={70} 
                   level={"H"} 
                   style={{ width: '100%', height: '100%' }}
