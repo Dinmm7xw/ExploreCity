@@ -1,0 +1,103 @@
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.event-card {
+  overflow: hidden;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  animation: slideUpFade 0.6s ease backwards;
+}
+
+.event-img {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.rating-badge {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 30px;
+  color: #ffd966;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.event-info {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.event-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+
+.event-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.event-meta i {
+  color: var(--primary);
+}
+
+.event-datetime {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 24px;
+  padding: 10px;
+  background: rgba(193, 123, 76, 0.05);
+  border-radius: 12px;
+}
+
+.detail-link {
+  margin-top: auto;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.detail-link:hover {
+  gap: 12px;
+  color: var(--primary-hover);
+}
+
+/* Эффект живых карточек при наведении */
+.event-card:hover .event-img {
+  opacity: 0;
+}
+
+.event-card:hover .event-video-hover {
+  opacity: 1 !important;
+}
+
+.event-img-wrapper iframe {
+  pointer-events: none;
+  transform: scale(1.5); /* Чтобы убрать черные полосы YouTube */
+}

@@ -1,0 +1,287 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { API_URL } from '../config';
+import { generateEventBanner, STYLE_PRESETS } from '../utils/aiService';
+
+const LOCATION_COORDS = {
+  "Астана Арена (Туран 48)": { lat: 51.1082, lng: 71.4024, city: "Astana" },
+  "Дворец Республики (Достык 56)": { lat: 43.2435, lng: 76.9572, city: "Almaty" },
+  "Barys Arena (Туран 57)": { lat: 51.1044, lng: 71.4069, city: "Astana" },
+  "Astana Opera (Кунаева 1)": { lat: 51.1257, lng: 71.4116, city: "Astana" },
+  "Центральный стадион (Абая 48)": { lat: 43.2383, lng: 76.9234, city: "Almaty" }
+};
+
+function EditEvent() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  
+  const [formData, setFormData] = useState({
+    title: '',
+    category: '',
+    city: 'Astana',
+    location: 'Астана Арена (Туран 48)',
+    date: '',
+    time: '',
+    description: '',
+    image_url: '',
+    rating: 5.0,
+    ai_style: 'photorealistic',
+    latitude: 43.2389,
+    longitude: 76.8897
+  });
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/events/${id}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        // Слияние данных: берем всё из базы + добавляем стиль по умолчанию, если его нет
+        setFormData(prev => ({...prev, ...data, ai_style: data.ai_style || 'photorealistic'}));
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvent();
+  }, [id]);
+
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'location' && LOCATION_COORDS[value]) {
+      setFormData({
+        ...formData, 
+        location: value, 
+        latitude: LOCATION_COORDS[value].lat, 
+        longitude: LOCATION_COORDS[value].lng,
+        city: LOCATION_COORDS[value].city
+      });
+    } else {
+      setFormData({...formData, [name]: value});
+    }
+  };
+
+  const handleMagicAI = async () => {
+    if (!formData.title) {
+        alert(t('enter_title_first'));
+        return;
+    }
+    
+    setIsGeneratingAI(true);
+    
+    try {
+        const styleKey = formData.ai_style || 'photorealistic';
+        const blobUrl = await generateEventBanner(formData.title, formData.category, styleKey);
+        setFormData(prev => ({...prev, image_url: blobUrl}));
+    } catch (err) {
+        console.error('AI Generation Error:', err);
+        alert(t('ai_error'));
+    } finally {
+        setIsGeneratingAI(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    setSubmitting(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/events/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      
+      alert(t('success_saved'));
+      navigate(`/event/${id}`);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) return <div style={{textAlign:'center', marginTop:'100px'}}>{t('loading')}</div>;
+
+  return (
+    <div className="container" style={{ padding: '40px 20px', maxWidth: '800px' }}>
+      <div className="glass-card" style={{ padding: '40px' }}>
+        <h2 style={{ fontSize: '32px', marginBottom: '32px', textAlign: 'center' }}>{t('edit_event')}</h2>
+        
+        {error && <div className="error-msg" style={{marginBottom: '20px', background: 'rgba(231, 76, 60, 0.1)', padding:'10px', borderRadius:'10px'}}>{error}</div>}
+        
+        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '24px' }}>
+          <div>
+            <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('title_label')}</label>
+            <input type="text" name="title" className="input-field" value={formData.title} onChange={handleChange} required />
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <div>
+              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('category_label')}</label>
+              <input type="text" name="category" className="input-field" placeholder={t('category_placeholder')} value={formData.category} onChange={handleChange} required />
+            </div>
+            <div>
+              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('city_label')}</label>
+              <select name="city" className="input-field" value={formData.city} onChange={handleChange}>
+                <option value="Astana">Astana</option>
+                <option value="Almaty">Almaty</option>
+                <option value="Shymkent">Shymkent</option>
+                <option value="Karaganda">Karaganda</option>
+                <option value="Aktau">Aktau</option>
+                <option value="Atyrau">Atyrau</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+             <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('location_label')}</label>
+             <select name="location" className="input-field" value={formData.location} onChange={handleChange}>
+                <option value="Астана Арена (Туран 48)">Астана Арена (Туран 48)</option>
+                <option value="Дворец Республики (Достык 56)">Дворец Республики (Достык 56)</option>
+                <option value="Barys Arena (Туран 57)">Barys Arena (Туран 57)</option>
+                <option value="Astana Opera (Кунаева 1)">Astana Opera (Кунаева 1)</option>
+                <option value="Центральный стадион (Абая 48)">Центральный стадион (Абая 48)</option>
+             </select>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <div>
+              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('date_label')}</label>
+              <input type="date" name="date" className="input-field" value={formData.date || ''} onChange={handleChange} />
+            </div>
+            <div>
+              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('time_label')}</label>
+              <input type="time" name="time" className="input-field" value={formData.time || ''} onChange={handleChange} />
+            </div>
+          </div>
+
+          <div>
+             <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('ai_style_label')}</label>
+             <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
+                <select 
+                    name="ai_style" 
+                    className="input-field" 
+                    style={{ width: 'auto', flex: 1, minWidth: '150px' }}
+                    value={formData.ai_style || 'photorealistic'}
+                    onChange={handleChange}
+                >
+                    {Object.keys(STYLE_PRESETS).map(key => (
+                        <option key={key} value={key}>{STYLE_PRESETS[key].label}</option>
+                    ))}
+                </select>
+
+                <button 
+                    type="button" 
+                    onClick={handleMagicAI}
+                    disabled={isGeneratingAI}
+                    style={{ 
+                        whiteSpace: 'nowrap', 
+                        background: isGeneratingAI ? '#bdc3c7' : 'linear-gradient(135deg, #6e8efb, #a777e3)', 
+                        color: 'white', 
+                        border: 'none', 
+                        padding: '0 25px', 
+                        borderRadius: '14px', 
+                        cursor: isGeneratingAI ? 'not-allowed' : 'pointer', 
+                        fontWeight: 'bold',
+                        fontSize: '15px',
+                        boxShadow: '0 6px 15px rgba(110, 142, 251, 0.3)',
+                        transition: 'all 0.3s ease',
+                        flex: 1
+                    }}>
+                    {isGeneratingAI ? (
+                        <><i className="fas fa-spinner fa-spin"></i> {t('drawing')}</>
+                    ) : (
+                        <><i className="fas fa-magic"></i> {t('magic_ai_btn')}</>
+                    )}
+                </button>
+             </div>
+             
+             <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                <input 
+                    type="url" 
+                    name="image_url" 
+                    className="input-field" 
+                    placeholder="Или вставьте свою ссылку (YouTube/Img)" 
+                    value={formData.image_url || ''} 
+                    onChange={handleChange} 
+                />
+             </div>
+             
+             {/* Живое превью новой картинки */}
+             {formData.image_url && (
+                <div style={{ marginBottom: '20px', borderRadius: '16px', overflow: 'hidden', border: isGeneratingAI ? '2px dashed var(--primary)' : '2px solid var(--primary)', position: 'relative', opacity: isGeneratingAI ? 0.6 : 1, transition: 'all 0.3s ease' }}>
+                     <img 
+                       src={(() => {
+                         if (!formData.image_url) return '';
+                         if (formData.image_url.includes('youtube.com') || formData.image_url.includes('youtu.be')) {
+                           const vidId = formData.image_url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|u\/\w\/|embed\/|watch\?v=))([^#&?]*)/)?.[1];
+                           return vidId ? `https://img.youtube.com/vi/${vidId}/0.jpg` : formData.image_url;
+                         }
+                         return formData.image_url;
+                       })()} 
+                       alt="Превью" 
+                       style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block' }} 
+                       key={formData.image_url}
+                     />
+                    <div style={{ position: 'absolute', bottom: '8px', left: '8px', right: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ background: 'rgba(0,0,0,0.6)', color: 'white', padding: '2px 8px', borderRadius: '10px', fontSize: '10px' }}>
+                            {isGeneratingAI ? t('ai_drawing') : t('ai_subtitle')}
+                        </span>
+                        {!isGeneratingAI && (
+                            <a href={formData.image_url} target="_blank" rel="noreferrer" style={{ color: 'white', fontSize: '10px', textDecoration: 'none', background: 'rgba(0,0,0,0.6)', padding: '2px 8px', borderRadius: '10px' }}>
+                                <i className="fas fa-external-link-alt"></i> {t('open_original')}
+                            </a>
+                        )}
+                    </div>
+                </div>
+             )}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <div>
+              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('latitude_label') || 'Latitude'}</label>
+              <input type="number" name="latitude" className="input-field" step="0.000001" value={formData.latitude} onChange={handleChange} />
+            </div>
+            <div>
+              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('longitude_label') || 'Longitude'}</label>
+              <input type="number" name="longitude" className="input-field" step="0.000001" value={formData.longitude} onChange={handleChange} />
+            </div>
+          </div>
+
+          <div>
+             <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('description_label')}</label>
+             <textarea name="description" className="input-field" style={{resize: 'vertical', minHeight: '120px'}} value={formData.description} onChange={handleChange}></textarea>
+          </div>
+
+          <div style={{ display: 'flex', gap: '15px' }}>
+            <button type="submit" className="btn-primary" style={{flex: 1, justifyContent: 'center', fontSize: '18px', padding: '16px'}} disabled={submitting}>
+                {submitting ? <div className="spinner"></div> : t('save_changes')}
+            </button>
+            <button type="button" className="btn-primary" style={{ background: '#95a5a6', border: 'none' }} onClick={() => navigate(-1)}>
+                {t('cancel')}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default EditEvent;
