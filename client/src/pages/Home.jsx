@@ -45,7 +45,7 @@ function Home() {
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '10px 20px', background: '#f8f9fa', borderRadius: '16px' }}>
             <i className="fas fa-map-marker-alt" style={{ color: 'var(--primary)', fontSize: '20px', marginRight: '15px' }}></i>
             <select value={city} onChange={(e) => setCity(e.target.value)} style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>
-              {popularCities.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+              {["Astana", "Almaty", "Shymkent", "Karaganda", "Aktobe", "Taraz", "Pavlodar", "Oskemen", "Semey", "Atyrau", "Kyzylorda", "Kostanay", "Oral", "Petropavl", "Aktau", "Turkistan", "Kokshetau", "Taldykorgan", "Zhezkazgan"].sort().map(c => <option key={c} value={c}>{c}</option>)}
               <option value="All">{t('all_cities')}</option>
             </select>
           </div>

@@ -125,12 +125,7 @@ function AddEvent() {
             <div>
               <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('city_label')}</label>
               <select name="city" className="input-field" value={formData.city} onChange={handleChange}>
-                <option value="Astana">Astana</option>
-                <option value="Almaty">Almaty</option>
-                <option value="Shymkent">Shymkent</option>
-                <option value="Karaganda">Karaganda</option>
-                <option value="Aktau">Aktau</option>
-                <option value="Atyrau">Atyrau</option>
+                {["Astana", "Almaty", "Shymkent", "Karaganda", "Aktobe", "Taraz", "Pavlodar", "Oskemen", "Semey", "Atyrau", "Kyzylorda", "Kostanay", "Oral", "Petropavl", "Aktau", "Turkistan", "Kokshetau", "Taldykorgan", "Zhezkazgan"].sort().map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
           </div>
