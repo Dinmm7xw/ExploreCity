@@ -132,13 +132,13 @@ function AddEvent() {
 
           <div>
              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('location_label')}</label>
-             <select name="location" className="input-field" value={formData.location} onChange={handleChange}>
-                <option value="Астана Арена (Туран 48)">Астана Арена (Туран 48)</option>
-                <option value="Дворец Республики (Достык 56)">Дворец Республики (Достык 56)</option>
-                <option value="Barys Arena (Туран 57)">Barys Arena (Туран 57)</option>
-                <option value="Astana Opera (Кунаева 1)">Astana Opera (Кунаева 1)</option>
-                <option value="Центральный стадион (Абая 48)">Центральный стадион (Абая 48)</option>
-             </select>
+             <input type="text" list="popular-locations" name="location" className="input-field" value={formData.location} onChange={handleChange} placeholder="Впишите точный адрес или выберите из списка..." />
+             <datalist id="popular-locations">
+                {Object.keys(LOCATION_COORDS)
+                  .filter(loc => !formData.city || LOCATION_COORDS[loc].city === formData.city)
+                  .map(loc => <option key={loc} value={loc} />)
+                }
+             </datalist>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
