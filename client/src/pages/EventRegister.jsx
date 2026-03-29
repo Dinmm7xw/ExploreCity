@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API_URL } from '../config';
 
 function EventRegister() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   
+  const searchParams = new URLSearchParams(location.search);
+  const sessionId = searchParams.get('session');
+
   const [event, setEvent] = useState(null);
+  const [sessionData, setSessionData] = useState(null);
   const [formData, setFormData] = useState({ tickets: 1, phone: '', seats: '' });
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [activeSector, setActiveSector] = useState(null); // 'A', 'B', 'C', 'D'
@@ -18,9 +23,15 @@ function EventRegister() {
   useEffect(() => {
     fetch(`${API_URL}/api/events/${id}`)
       .then(res => res.json())
-      .then(data => setEvent(data))
+      .then(data => {
+        setEvent(data);
+        if (sessionId && data.sessions) {
+          const s = data.sessions.find(s => s.id.toString() === sessionId);
+          if (s) setSessionData(s);
+        }
+      })
       .catch(err => console.error(err));
-  }, [id]);
+  }, [id, sessionId]);
 
   useEffect(() => {
     setFormData({ ...formData, tickets: selectedSeats.length || 1, seats: selectedSeats.join(', ') });
@@ -38,7 +49,7 @@ function EventRegister() {
     }
   };
 
-  const isSeatingEvent = event && event.location && event.location.includes('Астана Арена');
+  const isSeatingEvent = event && (sessionData ? sessionData.location : event.location)?.includes('Астана Арена');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,7 +71,12 @@ function EventRegister() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ tickets: formData.tickets, phone: formData.phone, seats: selectedSeats.join(', ') })
+        body: JSON.stringify({ 
+          tickets: formData.tickets, 
+          phone: formData.phone, 
+          seats: selectedSeats.join(', '),
+          session_id: sessionId || null 
+        })
       });
       
       const data = await res.json();
@@ -192,9 +208,9 @@ function EventRegister() {
             <div>
                 <div style={{ background: 'rgba(193, 123, 76, 0.05)', padding: '24px', borderRadius: '16px', marginBottom: '24px' }}>
                     <h3 style={{ fontSize: '18px', color: 'var(--primary)', marginBottom: '12px' }}><i className="fas fa-info-circle"></i> Детали бронирования</h3>
-                    <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>Город:</strong> {event.city}</p>
-                    <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>Место:</strong> {event.location}</p>
-                    <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>Дата:</strong> {event.date || 'Уточняется'} в {event.time || ''}</p>
+                    <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>Город:</strong> {sessionData ? sessionData.city : event.city}</p>
+                    <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>Место:</strong> {sessionData ? sessionData.location : event.location}</p>
+                    <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>Дата:</strong> {sessionData ? sessionData.date : (event.date || 'Уточняется')} в {sessionData ? sessionData.time : (event.time || '')}</p>
                 </div>
 
                 {error && <div className="error-msg" style={{marginBottom: '20px'}}>{error}</div>}

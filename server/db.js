@@ -52,10 +52,22 @@ export const initDb = async () => {
         PRIMARY KEY (user_id, event_id)
       );
 
+      CREATE TABLE IF NOT EXISTS event_sessions (
+        id SERIAL PRIMARY KEY,
+        event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+        city VARCHAR(100),
+        location VARCHAR(255),
+        date VARCHAR(50),
+        time VARCHAR(50),
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8)
+      );
+
       CREATE TABLE IF NOT EXISTS event_registrations (
         id SERIAL PRIMARY KEY,
         user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+        session_id INTEGER REFERENCES event_sessions(id) ON DELETE SET NULL,
         tickets INTEGER DEFAULT 1,
         seats TEXT,
         phone VARCHAR(20),
@@ -159,6 +171,16 @@ export const initDb = async () => {
         comment TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+    `);
+
+    // Миграция расписаний и сеансов (Мастер-событие)
+    await pool.query(`
+      DO $$ 
+      BEGIN 
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='event_registrations' AND column_name='session_id') THEN
+          ALTER TABLE event_registrations ADD COLUMN session_id INTEGER REFERENCES event_sessions(id) ON DELETE SET NULL;
+        END IF;
+      END $$;
     `);
 
     console.log('PostgreSQL (pgAdmin) Database tables initialized and migrated successfully.');

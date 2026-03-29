@@ -31,9 +31,11 @@ router.get('/tickets', requireAuth, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT e.id as event_id, e.title, e.date, e.time, e.location, e.city, e.image_url, 
-              r.id as ticket_id, r.tickets as ticket_count, r.seats, r.created_at, r.status 
+              r.id as ticket_id, r.tickets as ticket_count, r.seats, r.created_at, r.status,
+              s.date as session_date, s.time as session_time, s.location as session_location, s.city as session_city
        FROM events e 
        JOIN event_registrations r ON e.id = r.event_id 
+       LEFT JOIN event_sessions s ON r.session_id = s.id
        WHERE r.user_id = $1 AND r.status = 'active'
        ORDER BY r.created_at DESC`,
       [req.user.id]
@@ -79,6 +81,11 @@ router.get('/:id', async (req, res) => {
     const event = result.rows[0];
     
     if (!event) return res.status(404).json({ message: 'Мероприятие не найдено' });
+
+    // Получаем прикрепленные сеансы (кинотеатры, туры)
+    const sessionsRes = await pool.query('SELECT * FROM event_sessions WHERE event_id = $1 ORDER BY date, time', [req.params.id]);
+    event.sessions = sessionsRes.rows;
+
     res.json(event);
   } catch (error) {
     console.error('Get Event Error:', error);
@@ -89,14 +96,25 @@ router.get('/:id', async (req, res) => {
 // POST /api/events - Создать мероприятие (только для администраторов)
 router.post('/', requireAdmin, async (req, res) => {
   try {
-    const { title, description, date, time, location, city, category, image_url, rating, latitude, longitude } = req.body;
+    const { title, description, date, time, location, city, category, image_url, rating, latitude, longitude, sessions } = req.body;
     
     const result = await pool.query(
       'INSERT INTO events (title, description, date, time, location, city, category, image_url, author_id, rating, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id',
       [title, description, date, time, location, city, category, image_url, req.user.id, rating || 5.0, latitude || null, longitude || null]
     );
     
-    res.status(201).json({ message: 'Мероприятие создано', id: result.rows[0].id });
+    const eventId = result.rows[0].id;
+
+    if (sessions && Array.isArray(sessions) && sessions.length > 0) {
+      for (let session of sessions) {
+        await pool.query(
+          'INSERT INTO event_sessions (event_id, city, location, date, time, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+          [eventId, session.city, session.location, session.date, session.time, session.latitude || null, session.longitude || null]
+        );
+      }
+    }
+    
+    res.status(201).json({ message: 'Мероприятие создано', id: eventId });
   } catch (error) {
     console.error('Create Event Error:', error);
     res.status(500).json({ message: 'Ошибка создания мероприятия' });
@@ -115,12 +133,22 @@ router.put('/:id', requireAuth, async (req, res) => {
       return res.status(403).json({ message: 'Нет доступа к редактированию' });
     }
 
-    const { title, description, date, time, location, city, category, image_url, latitude, longitude } = req.body;
+    const { title, description, date, time, location, city, category, image_url, latitude, longitude, sessions } = req.body;
     
     await pool.query(
       'UPDATE events SET title = $1, description = $2, date = $3, time = $4, location = $5, city = $6, category = $7, image_url = $8, latitude = $9, longitude = $10 WHERE id = $11',
       [title, description, date, time, location, city, category, image_url, latitude || null, longitude || null, req.params.id]
     );
+
+    if (sessions && Array.isArray(sessions)) {
+      await pool.query('DELETE FROM event_sessions WHERE event_id = $1', [req.params.id]);
+      for (let session of sessions) {
+        await pool.query(
+          'INSERT INTO event_sessions (event_id, city, location, date, time, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+          [req.params.id, session.city, session.location, session.date, session.time, session.latitude || null, session.longitude || null]
+        );
+      }
+    }
 
     res.json({ message: 'Мероприятие обновлено' });
   } catch (error) {
@@ -173,14 +201,14 @@ router.post('/:id/save', requireAuth, async (req, res) => {
 // POST /api/events/:id/register - Бронирование билета
 router.post('/:id/register', requireAuth, async (req, res) => {
   try {
-    const { tickets, phone, seats } = req.body;
+    const { tickets, phone, seats, session_id } = req.body;
     
     const result = await pool.query('SELECT * FROM events WHERE id = $1', [req.params.id]);
     if (!result.rows[0]) return res.status(404).json({ message: 'Мероприятие не найдено' });
 
     await pool.query(
-      'INSERT INTO event_registrations (user_id, event_id, tickets, phone, seats) VALUES ($1, $2, $3, $4, $5)',
-      [req.user.id, req.params.id, tickets || 1, phone || '', seats || '']
+      'INSERT INTO event_registrations (user_id, event_id, tickets, phone, seats, session_id) VALUES ($1, $2, $3, $4, $5, $6)',
+      [req.user.id, req.params.id, tickets || 1, phone || '', seats || '', session_id || null]
     );
 
     // Получаем детали пользователя и события для Email
@@ -209,9 +237,11 @@ router.get('/check/validate', async (req, res) => {
     const { id, user } = req.query;
     
     const result = await pool.query(
-      `SELECT e.title, e.date, e.time, e.location, u.name as user_name, r.status, r.tickets
+      `SELECT e.title, e.date, e.time, e.location, u.name as user_name, r.status, r.tickets,
+              s.date as session_date, s.time as session_time, s.location as session_location
        FROM event_registrations r
        JOIN events e ON r.event_id = e.id
+       LEFT JOIN event_sessions s ON r.session_id = s.id
        JOIN users u ON r.user_id = u.id
        WHERE r.id = $1 AND r.user_id = $2`,
       [id, user]

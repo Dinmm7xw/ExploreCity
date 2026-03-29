@@ -28,6 +28,7 @@ function EventDetails({ isAuthenticated }) {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [selectedSession, setSelectedSession] = useState(null);
 
   const fetchEvent = useCallback(async () => {
     try {
@@ -78,6 +79,9 @@ function EventDetails({ isAuthenticated }) {
     const loadAll = async () => {
       setLoading(true);
       const evt = await fetchEvent();
+      if (evt && evt.sessions && evt.sessions.length > 0) {
+        setSelectedSession(evt.sessions[0]);
+      }
       await fetchReviews();
       if (evt) await fetchWeather(evt);
       setLoading(false);
@@ -175,8 +179,8 @@ function EventDetails({ isAuthenticated }) {
           <h1 style={{ fontSize: '36px', marginBottom: '16px', color: 'var(--text-main)' }}>{event.title}</h1>
           <div style={{ display: 'flex', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
             <span style={{background: 'rgba(193, 123, 76, 0.1)', padding: '8px 16px', borderRadius: '20px', color: 'var(--primary)', fontWeight: 'bold'}}><i className="fas fa-tag"></i> {event.category}</span>
-            <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="fas fa-location-dot" style={{color: 'var(--primary)'}}></i> {event.city}, {event.location}</span>
-            <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="far fa-calendar-alt" style={{color: 'var(--primary)'}}></i> {event.date}</span>
+            <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="fas fa-location-dot" style={{color: 'var(--primary)'}}></i> {selectedSession ? `${selectedSession.city}, ${selectedSession.location}` : `${event.city}, ${event.location}`}</span>
+            <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="far fa-calendar-alt" style={{color: 'var(--primary)'}}></i> {selectedSession ? `${selectedSession.date} в ${selectedSession.time}` : `${event.date} ${event.time ? `в ${event.time}` : ''}`}</span>
             <span style={{background: '#ffd966', padding: '8px 16px', borderRadius: '20px', color: '#000', fontWeight: 'bold'}}><i className="fas fa-star"></i> {event.rating}</span>
             {weather && (
               <span style={{background: 'rgba(52, 152, 219, 0.1)', padding: '8px 16px', borderRadius: '20px', color: '#2980b9', fontWeight: 'bold'}}>
@@ -185,28 +189,64 @@ function EventDetails({ isAuthenticated }) {
             )}
           </div>
 
+          {event.sessions && event.sessions.length > 0 && (
+            <div style={{ marginBottom: '30px', background: 'rgba(0,0,0,0.02)', padding: '24px', borderRadius: '16px', border: '1px solid #eee' }}>
+              <h3 style={{ fontSize: '18px', marginBottom: '16px' }}><i className="far fa-clock" style={{color: 'var(--primary)'}}></i> Выберите расписание и место</h3>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                {event.sessions.map(s => (
+                  <button 
+                    key={s.id} 
+                    onClick={() => setSelectedSession(s)}
+                    style={{ 
+                      padding: '12px 20px', 
+                      borderRadius: '12px', 
+                      border: selectedSession?.id === s.id ? '2px solid var(--primary)' : '1px solid #ddd',
+                      background: selectedSession?.id === s.id ? 'rgba(193, 123, 76, 0.05)' : 'white',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: '0.2s',
+                      boxShadow: selectedSession?.id === s.id ? '0 4px 10px rgba(193, 123, 76, 0.15)' : 'none'
+                    }}
+                  >
+                    <div style={{ fontWeight: 'bold', fontSize: '15px', color: selectedSession?.id === s.id ? 'var(--primary)' : '#333' }}>{s.date} • {s.time}</div>
+                    <div style={{ fontSize: '13px', color: '#666', marginTop: '6px' }}><i className="fas fa-map-marker-alt"></i> {s.city}, {s.location}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div style={{ fontSize: '18px', color: 'var(--text-muted)', lineHeight: '1.8', marginBottom: '40px' }}>
             {event.description}
           </div>
 
           <div style={{ marginBottom: '40px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
             <h3 style={{ marginBottom: '16px', fontSize: '20px' }}><i className="fas fa-map-marked-alt" style={{color: 'var(--primary)'}}></i> {t('location_on_map')}</h3>
-            {event.latitude && event.longitude ? (
-              <iframe 
-                src={`https://yandex.ru/map-widget/v1/?ll=${event.longitude},${event.latitude}&z=16&pt=${event.longitude},${event.latitude},pm2rdm`} 
-                width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px' }}>
-              </iframe>
-            ) : (
-              <iframe 
-                src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(event.city + ', ' + event.location)}&z=16`} 
-                width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px' }}>
-              </iframe>
-            )}
+            {(() => {
+              const activeLat = selectedSession ? selectedSession.latitude : event.latitude;
+              const activeLng = selectedSession ? selectedSession.longitude : event.longitude;
+              const activeCity = selectedSession ? selectedSession.city : event.city;
+              const activeLoc = selectedSession ? selectedSession.location : event.location;
+
+              return activeLat && activeLng ? (
+                <iframe 
+                  key={`${activeLat}-${activeLng}`}
+                  src={`https://yandex.ru/map-widget/v1/?ll=${activeLng},${activeLat}&z=16&pt=${activeLng},${activeLat},pm2rdm`} 
+                  width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px' }}>
+                </iframe>
+              ) : (
+                <iframe 
+                  key={`${activeCity}-${activeLoc}`}
+                  src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(activeCity + ', ' + activeLoc)}&z=16`} 
+                  width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px' }}>
+                </iframe>
+              );
+            })()}
           </div>
 
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             {isAuthenticated && (
-              <button className="btn-primary" style={{ background: '#2ecc71', color: 'white' }} onClick={() => navigate(`/event/${id}/register`)}>
+              <button className="btn-primary" style={{ background: '#2ecc71', color: 'white' }} onClick={() => navigate(selectedSession ? `/event/${id}/register?session=${selectedSession.id}` : `/event/${id}/register`)}>
                 <i className="fas fa-ticket-alt"></i> {t('book_ticket')}
               </button>
             )}

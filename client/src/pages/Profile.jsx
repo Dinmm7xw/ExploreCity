@@ -165,8 +165,8 @@ function Profile() {
               <span style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>{t('event_ticket') || 'Билет на мероприятие'}</span>
               <h4 style={{ fontSize: '18px', margin: '4px 0 12px', color: 'var(--text-main)', lineHeight: '1.3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tk.title}</h4>
               <div className="main-info">
-                <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}><i className="far fa-calendar-alt"></i> {tk.date} в {tk.time}</p>
-                <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><i className="fas fa-map-marker-alt"></i> {tk.location}, {tk.city}</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}><i className="far fa-calendar-alt"></i> {tk.session_date || tk.date} в {tk.session_time || tk.time}</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><i className="fas fa-map-marker-alt"></i> {tk.session_location || tk.location}, {tk.session_city || tk.city}</p>
               </div>
 
               {tk.seats && (

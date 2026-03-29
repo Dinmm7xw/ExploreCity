@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API_URL } from '../config';
-import { generateEventBanner, STYLE_PRESETS } from '../utils/aiService';
 
 const LOCATION_COORDS = {
   "Астана Арена (Туран 48)": { lat: 51.1082, lng: 71.4024, city: "Astana" },
@@ -30,11 +29,51 @@ function EditEvent() {
     description: '',
     image_url: '',
     rating: 5.0,
-    ai_style: 'photorealistic',
     latitude: 43.2389,
     longitude: 76.8897,
-    coordinatesStr: ''
+    coordinatesStr: '',
+    sessions: []
   });
+
+  const handleAddSession = () => {
+    setFormData({
+      ...formData,
+      sessions: [...(formData.sessions || []), { city: formData.city, location: '', date: '', time: '', coordinatesStr: '', latitude: null, longitude: null }]
+    });
+  };
+
+  const handleRemoveSession = (index) => {
+    const newSessions = [...formData.sessions];
+    newSessions.splice(index, 1);
+    setFormData({ ...formData, sessions: newSessions });
+  };
+
+  const handleSessionChange = (index, field, value) => {
+    const newSessions = [...formData.sessions];
+    
+    if (field === 'coordinatesStr') {
+      newSessions[index].coordinatesStr = value;
+      const parts = value.split(',').map(p => p.trim());
+      let lat = null, lng = null;
+      if (parts.length >= 2 && parts[0] !== '' && parts[1] !== '') {
+        lat = parseFloat(parts[0]);
+        lng = parseFloat(parts[1]);
+      }
+      newSessions[index].latitude = isNaN(lat) ? null : lat;
+      newSessions[index].longitude = isNaN(lng) ? null : lng;
+    } else if (field === 'location' && LOCATION_COORDS[value]) {
+       // Auto-fill from constants if they type known place
+      newSessions[index].location = value;
+      newSessions[index].latitude = LOCATION_COORDS[value].lat;
+      newSessions[index].longitude = LOCATION_COORDS[value].lng;
+      newSessions[index].city = LOCATION_COORDS[value].city;
+      newSessions[index].coordinatesStr = `${LOCATION_COORDS[value].lat}, ${LOCATION_COORDS[value].lng}`;
+    } else {
+      newSessions[index][field] = value;
+    }
+    
+    setFormData({ ...formData, sessions: newSessions });
+  };
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -42,9 +81,9 @@ function EditEvent() {
         const res = await fetch(`${API_URL}/api/events/${id}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
-        // Слияние данных: берем всё из базы + добавляем стиль по умолчанию, если его нет
+        // Слияние данных
         setFormData(prev => {
-          const loadedData = {...prev, ...data, ai_style: data.ai_style || 'photorealistic'};
+          const loadedData = {...prev, ...data};
           if (data.latitude && data.longitude) {
             loadedData.coordinatesStr = `${data.latitude}, ${data.longitude}`;
           }
@@ -58,8 +97,6 @@ function EditEvent() {
     };
     fetchEvent();
   }, [id]);
-
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,26 +123,6 @@ function EditEvent() {
       setFormData({...formData, coordinatesStr: value, latitude: isNaN(lat) ? '' : lat, longitude: isNaN(lng) ? '' : lng});
     } else {
       setFormData({...formData, [name]: value});
-    }
-  };
-
-  const handleMagicAI = async () => {
-    if (!formData.title) {
-        alert(t('enter_title_first'));
-        return;
-    }
-    
-    setIsGeneratingAI(true);
-    
-    try {
-        const styleKey = formData.ai_style || 'photorealistic';
-        const blobUrl = await generateEventBanner(formData.title, formData.category, styleKey);
-        setFormData(prev => ({...prev, image_url: blobUrl}));
-    } catch (err) {
-        console.error('AI Generation Error:', err);
-        alert(t('ai_error'));
-    } finally {
-        setIsGeneratingAI(false);
     }
   };
 
@@ -188,83 +205,24 @@ function EditEvent() {
           </div>
 
           <div>
-             <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('ai_style_label')}</label>
-             <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
-                <select 
-                    name="ai_style" 
-                    className="input-field" 
-                    style={{ width: 'auto', flex: 1, minWidth: '150px' }}
-                    value={formData.ai_style || 'photorealistic'}
-                    onChange={handleChange}
-                >
-                    {Object.keys(STYLE_PRESETS).map(key => (
-                        <option key={key} value={key}>{STYLE_PRESETS[key].label}</option>
-                    ))}
-                </select>
-
-                <button 
-                    type="button" 
-                    onClick={handleMagicAI}
-                    disabled={isGeneratingAI}
-                    style={{ 
-                        whiteSpace: 'nowrap', 
-                        background: isGeneratingAI ? '#bdc3c7' : 'linear-gradient(135deg, #6e8efb, #a777e3)', 
-                        color: 'white', 
-                        border: 'none', 
-                        padding: '0 25px', 
-                        borderRadius: '14px', 
-                        cursor: isGeneratingAI ? 'not-allowed' : 'pointer', 
-                        fontWeight: 'bold',
-                        fontSize: '15px',
-                        boxShadow: '0 6px 15px rgba(110, 142, 251, 0.3)',
-                        transition: 'all 0.3s ease',
-                        flex: 1
-                    }}>
-                    {isGeneratingAI ? (
-                        <><i className="fas fa-spinner fa-spin"></i> {t('drawing')}</>
-                    ) : (
-                        <><i className="fas fa-magic"></i> {t('magic_ai_btn')}</>
-                    )}
-                </button>
-             </div>
-             
-             <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                <input 
-                    type="url" 
-                    name="image_url" 
-                    className="input-field" 
-                    placeholder="Или вставьте свою ссылку (YouTube/Img)" 
-                    value={formData.image_url || ''} 
-                    onChange={handleChange} 
-                />
-             </div>
+             <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('image_url_label') || 'URL изображения / YouTube видео'}</label>
+             <input type="text" name="image_url" className="input-field" value={formData.image_url || ''} onChange={handleChange} placeholder={t('image_url_placeholder') || "Вставьте ссылку на картинку или YouTube видео..."} />
              
              {/* Живое превью новой картинки */}
              {formData.image_url && (
-                <div style={{ marginBottom: '20px', borderRadius: '16px', overflow: 'hidden', border: isGeneratingAI ? '2px dashed var(--primary)' : '2px solid var(--primary)', position: 'relative', opacity: isGeneratingAI ? 0.6 : 1, transition: 'all 0.3s ease' }}>
-                     <img 
-                       src={(() => {
-                         if (!formData.image_url) return '';
-                         if (formData.image_url.includes('youtube.com') || formData.image_url.includes('youtu.be')) {
-                           const vidId = formData.image_url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|u\/\w\/|embed\/|watch\?v=))([^#&?]*)/)?.[1];
-                           return vidId ? `https://img.youtube.com/vi/${vidId}/0.jpg` : formData.image_url;
-                         }
-                         return formData.image_url;
-                       })()} 
-                       alt="Превью" 
-                       style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block' }} 
-                       key={formData.image_url}
-                     />
-                    <div style={{ position: 'absolute', bottom: '8px', left: '8px', right: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ background: 'rgba(0,0,0,0.6)', color: 'white', padding: '2px 8px', borderRadius: '10px', fontSize: '10px' }}>
-                            {isGeneratingAI ? t('ai_drawing') : t('ai_subtitle')}
-                        </span>
-                        {!isGeneratingAI && (
-                            <a href={formData.image_url} target="_blank" rel="noreferrer" style={{ color: 'white', fontSize: '10px', textDecoration: 'none', background: 'rgba(0,0,0,0.6)', padding: '2px 8px', borderRadius: '10px' }}>
-                                <i className="fas fa-external-link-alt"></i> {t('open_original')}
-                            </a>
-                        )}
-                    </div>
+                <div style={{ marginTop: '15px', borderRadius: '16px', overflow: 'hidden', border: '2px solid var(--primary)' }}>
+                    <img 
+                      src={(() => {
+                        if (!formData.image_url) return '';
+                        if (formData.image_url.includes('youtube.com') || formData.image_url.includes('youtu.be')) {
+                          const vidId = formData.image_url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|u\/\w\/|embed\/|watch\?v=))([^#&?]*)/)?.[1];
+                          return vidId ? `https://img.youtube.com/vi/${vidId}/0.jpg` : formData.image_url;
+                        }
+                        return formData.image_url;
+                      })()} 
+                      alt="Превью" 
+                      style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block' }} 
+                    />
                 </div>
              )}
           </div>
@@ -273,6 +231,52 @@ function EditEvent() {
             <label style={{display:'block', marginBottom:'4px', fontWeight:'600'}}>Координаты <span style={{fontSize:'12px', color:'#888', fontWeight:'normal'}}>(Широта, Долгота из Google/Yandex Карт)</span></label>
             <input type="text" name="coordinatesStr" className="input-field" value={formData.coordinatesStr || ''} onChange={handleChange} placeholder="Например: 53.2846, 69.3882" />
           </div>
+
+          {/* SESSIONS BLOCK */}
+          <div style={{ marginTop: '10px', padding: '20px', background: 'rgba(0,0,0,0.02)', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px' }}>Расписание сеансов (Опционально)</h3>
+              <button type="button" onClick={handleAddSession} style={{ padding: '6px 16px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}>+ Добавить сеанс</button>
+            </div>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '-8px', marginBottom: '20px' }}>Используйте для кинофильмов или туров с несколькими датами/кинотеатрами.</p>
+
+            {formData.sessions && formData.sessions.map((session, idx) => (
+              <div key={idx} style={{ padding: '16px', background: 'var(--card-bg)', borderRadius: '14px', border: '1px solid var(--border-color)', marginBottom: '15px', position: 'relative', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
+                <button type="button" onClick={() => handleRemoveSession(idx)} style={{ position: 'absolute', top: '10px', right: '10px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>&times;</button>
+                <div style={{ fontWeight: 'bold', marginBottom: '15px', color: 'var(--primary)' }}>Сеанс #{idx + 1}</div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '12px' }}>
+                  <div>
+                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Дата</label>
+                    <input type="date" className="input-field" value={session.date || ''} onChange={(e) => handleSessionChange(idx, 'date', e.target.value)} style={{ padding: '10px' }} />
+                  </div>
+                  <div>
+                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Время</label>
+                    <input type="time" className="input-field" value={session.time || ''} onChange={(e) => handleSessionChange(idx, 'time', e.target.value)} style={{ padding: '10px' }} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '15px', marginBottom: '12px' }}>
+                  <div>
+                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Город</label>
+                    <select className="input-field" value={session.city || ''} onChange={(e) => handleSessionChange(idx, 'city', e.target.value)} style={{ padding: '10px' }}>
+                       {["Astana", "Almaty", "Shymkent", "Karaganda", "Aktobe", "Taraz", "Pavlodar", "Oskemen", "Semey", "Atyrau", "Kyzylorda", "Kostanay", "Oral", "Petropavl", "Aktau", "Turkistan", "Kokshetau", "Taldykorgan", "Zhezkazgan"].sort().map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Место / Кинотеатр</label>
+                    <input type="text" list="popular-locations" className="input-field" value={session.location || ''} onChange={(e) => handleSessionChange(idx, 'location', e.target.value)} placeholder="Kinopark 11 IMAX..." style={{ padding: '10px' }} />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Координаты (Широта, Долгота)</label>
+                  <input type="text" className="input-field" value={session.coordinatesStr || ''} onChange={(e) => handleSessionChange(idx, 'coordinatesStr', e.target.value)} placeholder="51.123, 71.456" style={{ padding: '10px' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* END SESSIONS BLOCK */}
 
           <div>
              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('description_label')}</label>
