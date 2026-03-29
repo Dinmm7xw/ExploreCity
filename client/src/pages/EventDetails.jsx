@@ -191,7 +191,17 @@ function EventDetails({ isAuthenticated }) {
 
           <div style={{ marginBottom: '40px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
             <h3 style={{ marginBottom: '16px', fontSize: '20px' }}><i className="fas fa-map-marked-alt" style={{color: 'var(--primary)'}}></i> {t('location_on_map')}</h3>
-            <iframe src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(event.city + ', ' + event.location)}&z=16`} width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px' }}></iframe>
+            {event.latitude && event.longitude ? (
+              <iframe 
+                src={`https://yandex.ru/map-widget/v1/?ll=${event.longitude},${event.latitude}&z=16&pt=${event.longitude},${event.latitude},pm2rdm`} 
+                width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px' }}>
+              </iframe>
+            ) : (
+              <iframe 
+                src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(event.city + ', ' + event.location)}&z=16`} 
+                width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px' }}>
+              </iframe>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
