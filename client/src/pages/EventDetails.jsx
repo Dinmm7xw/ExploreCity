@@ -80,7 +80,25 @@ function EventDetails({ isAuthenticated }) {
       setLoading(true);
       const evt = await fetchEvent();
       if (evt && evt.sessions && evt.sessions.length > 0) {
-        setSelectedSession(evt.sessions[0]);
+        const masterAsSession = {
+          id: 'master',
+          city: evt.city,
+          location: evt.location,
+          date: evt.date,
+          time: evt.time || '',
+          latitude: evt.latitude,
+          longitude: evt.longitude
+        };
+        const isDuplicate = evt.sessions.some(s => s.city === evt.city && s.location === evt.location && s.date === evt.date);
+        
+        let newSessions = [...evt.sessions];
+        if (!isDuplicate) {
+          newSessions = [masterAsSession, ...newSessions];
+        }
+        
+        evt.sessions = newSessions;
+        setEvent({...evt});
+        setSelectedSession(newSessions[0]);
       }
       await fetchReviews();
       if (evt) await fetchWeather(evt);
@@ -180,7 +198,7 @@ function EventDetails({ isAuthenticated }) {
           <div style={{ display: 'flex', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
             <span style={{background: 'rgba(193, 123, 76, 0.1)', padding: '8px 16px', borderRadius: '20px', color: 'var(--primary)', fontWeight: 'bold'}}><i className="fas fa-tag"></i> {event.category}</span>
             <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="fas fa-location-dot" style={{color: 'var(--primary)'}}></i> {selectedSession ? `${selectedSession.city}, ${selectedSession.location}` : `${event.city}, ${event.location}`}</span>
-            <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="far fa-calendar-alt" style={{color: 'var(--primary)'}}></i> {selectedSession ? `${selectedSession.date} в ${selectedSession.time}` : `${event.date} ${event.time ? `в ${event.time}` : ''}`}</span>
+            <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="far fa-calendar-alt" style={{color: 'var(--primary)'}}></i> {selectedSession ? `${selectedSession.date} ${selectedSession.time ? `в ${selectedSession.time}` : ''}` : `${event.date} ${event.time ? `в ${event.time}` : ''}`}</span>
             <span style={{background: '#ffd966', padding: '8px 16px', borderRadius: '20px', color: '#000', fontWeight: 'bold'}}><i className="fas fa-star"></i> {event.rating}</span>
             {weather && (
               <span style={{background: 'rgba(52, 152, 219, 0.1)', padding: '8px 16px', borderRadius: '20px', color: '#2980b9', fontWeight: 'bold'}}>
@@ -246,7 +264,7 @@ function EventDetails({ isAuthenticated }) {
 
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             {isAuthenticated && (
-              <button className="btn-primary" style={{ background: '#2ecc71', color: 'white' }} onClick={() => navigate(selectedSession ? `/event/${id}/register?session=${selectedSession.id}` : `/event/${id}/register`)}>
+              <button className="btn-primary" style={{ background: '#2ecc71', color: 'white' }} onClick={() => navigate(selectedSession && selectedSession.id !== 'master' ? `/event/${id}/register?session=${selectedSession.id}` : `/event/${id}/register`)}>
                 <i className="fas fa-ticket-alt"></i> {t('book_ticket')}
               </button>
             )}
