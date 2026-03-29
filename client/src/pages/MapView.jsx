@@ -16,7 +16,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function MapView() {
+function MapView({ embedded = false }) {
   const { t } = useTranslation();
   const [events, setEvents] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
@@ -97,6 +97,35 @@ function MapView() {
     };
   }, [loading, events, t]);
 
+  const mapContent = (
+      <div className="glass-card" style={{ padding: '10px', height: embedded ? '500px' : '600px', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
+        {loading ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <div className="spinner"></div>
+          </div>
+        ) : (
+          <div ref={mapRef} style={{ height: '100%', width: '100%', borderRadius: '15px', zIndex: 1 }}></div>
+        )}
+      </div>
+  );
+
+  if (embedded) {
+    return (
+      <div style={{ padding: '60px 0', background: 'rgba(0,0,0,0.02)' }}>
+        <div className="container">
+          <div className="section-title">
+            <h2>{t('event_map') || 'Все мероприятия на карте'}</h2>
+            <div className="title-underline"></div>
+          </div>
+          {mapContent}
+          <div style={{ marginTop: '20px', color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>
+            <i className="fas fa-info-circle"></i> {t('map_hint') || 'Нажмите на маркер, чтобы увидеть детали мероприятия'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container" style={{ padding: '40px 20px', minHeight: '80vh' }}>
       <div className="section-title">
@@ -104,15 +133,7 @@ function MapView() {
         <div className="title-underline"></div>
       </div>
 
-      <div className="glass-card" style={{ padding: '10px', height: '600px', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
-        {loading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <div className="spinner"></div>
-          </div>
-        ) : (
-          <div ref={mapRef} style={{ height: '100%', width: '100%', borderRadius: '15px' }}></div>
-        )}
-      </div>
+      {mapContent}
       
       <div style={{ marginTop: '20px', color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>
         <i className="fas fa-info-circle"></i> {t('map_hint') || 'Нажмите на маркер, чтобы увидеть детали мероприятия'}

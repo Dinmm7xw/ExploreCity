@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import AfishaCarousel from '../components/AfishaCarousel';
+import MapView from './MapView';
 import './Home.css';
 
 function Home() {
@@ -81,22 +82,8 @@ function Home() {
         </div>
       </div>
 
-      {/* 4. Карта Мероприятий 2GIS / Яндекс (Оставлена внизу) */}
-      <div style={{ padding: '60px 0', background: 'rgba(0,0,0,0.02)' }}>
-        <div className="container">
-          <div className="section-title">
-            <h2>{t('event_map')}</h2>
-            <div className="title-underline"></div>
-          </div>
-          <iframe 
-            src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent('Мәдени шаралар мұражай театр Қазақстан ' + city)}`} 
-            width="100%" 
-            height="500" 
-            frameBorder="0"
-            style={{ borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
-          ></iframe>
-        </div>
-      </div>
+      {/* 4. Карта Мероприятий Leaflet */}
+      <MapView embedded={true} />
     </>
   );
 }
