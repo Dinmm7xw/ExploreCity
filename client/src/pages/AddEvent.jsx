@@ -29,7 +29,8 @@ function AddEvent() {
     image_url: '',
     ai_style: 'photorealistic',
     latitude: 51.1082,
-    longitude: 71.4024
+    longitude: 71.4024,
+    coordinatesStr: '51.1082, 71.4024'
   });
 
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
@@ -43,11 +44,20 @@ function AddEvent() {
           location: value, 
           latitude: LOCATION_COORDS[value].lat, 
           longitude: LOCATION_COORDS[value].lng,
-          city: LOCATION_COORDS[value].city
+          city: LOCATION_COORDS[value].city,
+          coordinatesStr: `${LOCATION_COORDS[value].lat}, ${LOCATION_COORDS[value].lng}`
         });
       } else {
-        setFormData({...formData, location: value, latitude: '', longitude: ''});
+        setFormData({...formData, location: value, latitude: '', longitude: '', coordinatesStr: ''});
       }
+    } else if (name === 'coordinatesStr') {
+      const parts = value.split(',').map(p => p.trim());
+      let lat = '', lng = '';
+      if (parts.length >= 2 && parts[0] !== '' && parts[1] !== '') {
+        lat = parseFloat(parts[0]);
+        lng = parseFloat(parts[1]);
+      }
+      setFormData({...formData, coordinatesStr: value, latitude: isNaN(lat) ? '' : lat, longitude: isNaN(lng) ? '' : lng});
     } else {
       setFormData({...formData, [name]: value});
     }
@@ -236,15 +246,9 @@ function AddEvent() {
              )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            <div>
-              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('latitude_label') || 'Latitude'}</label>
-              <input type="number" name="latitude" className="input-field" step="0.000001" value={formData.latitude} onChange={handleChange} />
-            </div>
-            <div>
-              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('longitude_label') || 'Longitude'}</label>
-              <input type="number" name="longitude" className="input-field" step="0.000001" value={formData.longitude} onChange={handleChange} />
-            </div>
+          <div>
+            <label style={{display:'block', marginBottom:'4px', fontWeight:'600'}}>Координаты <span style={{fontSize:'12px', color:'#888', fontWeight:'normal'}}>(Широта, Долгота из Google/Yandex Карт)</span></label>
+            <input type="text" name="coordinatesStr" className="input-field" value={formData.coordinatesStr} onChange={handleChange} placeholder="Например: 53.2846, 69.3882" />
           </div>
 
           <div>

@@ -32,7 +32,8 @@ function EditEvent() {
     rating: 5.0,
     ai_style: 'photorealistic',
     latitude: 43.2389,
-    longitude: 76.8897
+    longitude: 76.8897,
+    coordinatesStr: ''
   });
 
   useEffect(() => {
@@ -42,7 +43,13 @@ function EditEvent() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
         // Слияние данных: берем всё из базы + добавляем стиль по умолчанию, если его нет
-        setFormData(prev => ({...prev, ...data, ai_style: data.ai_style || 'photorealistic'}));
+        setFormData(prev => {
+          const loadedData = {...prev, ...data, ai_style: data.ai_style || 'photorealistic'};
+          if (data.latitude && data.longitude) {
+            loadedData.coordinatesStr = `${data.latitude}, ${data.longitude}`;
+          }
+          return loadedData;
+        });
       } catch (err) {
         setError(err.message);
       } finally {
@@ -63,11 +70,20 @@ function EditEvent() {
           location: value, 
           latitude: LOCATION_COORDS[value].lat, 
           longitude: LOCATION_COORDS[value].lng,
-          city: LOCATION_COORDS[value].city
+          city: LOCATION_COORDS[value].city,
+          coordinatesStr: `${LOCATION_COORDS[value].lat}, ${LOCATION_COORDS[value].lng}`
         });
       } else {
-        setFormData({...formData, location: value, latitude: '', longitude: ''});
+        setFormData({...formData, location: value, latitude: '', longitude: '', coordinatesStr: ''});
       }
+    } else if (name === 'coordinatesStr') {
+      const parts = value.split(',').map(p => p.trim());
+      let lat = '', lng = '';
+      if (parts.length >= 2 && parts[0] !== '' && parts[1] !== '') {
+        lat = parseFloat(parts[0]);
+        lng = parseFloat(parts[1]);
+      }
+      setFormData({...formData, coordinatesStr: value, latitude: isNaN(lat) ? '' : lat, longitude: isNaN(lng) ? '' : lng});
     } else {
       setFormData({...formData, [name]: value});
     }
@@ -253,15 +269,9 @@ function EditEvent() {
              )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            <div>
-              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('latitude_label') || 'Latitude'}</label>
-              <input type="number" name="latitude" className="input-field" step="0.000001" value={formData.latitude} onChange={handleChange} />
-            </div>
-            <div>
-              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('longitude_label') || 'Longitude'}</label>
-              <input type="number" name="longitude" className="input-field" step="0.000001" value={formData.longitude} onChange={handleChange} />
-            </div>
+          <div>
+            <label style={{display:'block', marginBottom:'4px', fontWeight:'600'}}>Координаты <span style={{fontSize:'12px', color:'#888', fontWeight:'normal'}}>(Широта, Долгота из Google/Yandex Карт)</span></label>
+            <input type="text" name="coordinatesStr" className="input-field" value={formData.coordinatesStr || ''} onChange={handleChange} placeholder="Например: 53.2846, 69.3882" />
           </div>
 
           <div>
