@@ -77,7 +77,7 @@ function AfishaCarousel() {
                   overflow: 'hidden', 
                   position: 'relative',
                   backgroundImage: !ytId ? `url(${cardImg})` : 'none',
-                  background: ytId ? '#000' : 'transparent',
+                  backgroundColor: ytId ? '#000' : 'transparent',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
