@@ -83,7 +83,7 @@ function Home() {
       </div>
 
       {/* 4. Карта Мероприятий Leaflet */}
-      <MapView embedded={true} />
+      <MapView embedded={true} activeCity={city} />
     </>
   );
 }

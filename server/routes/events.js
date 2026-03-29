@@ -9,14 +9,24 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const { city } = req.query;
-    let events;
+    
+    // Получаем все события
+    const result = await pool.query('SELECT * FROM events');
+    let events = result.rows;
 
+    // Получаем все сеансы
+    const sessionsRes = await pool.query('SELECT * FROM event_sessions');
+    const allSessions = sessionsRes.rows;
+
+    // Склеиваем события с их сеансами
+    events = events.map(ev => ({
+      ...ev,
+      sessions: allSessions.filter(s => s.event_id === ev.id)
+    }));
+
+    // Фильтруем по городу, проверяя и само событие, и его сеансы
     if (city && city !== 'All') {
-      const result = await pool.query('SELECT * FROM events WHERE city = $1', [city]);
-      events = result.rows;
-    } else {
-      const result = await pool.query('SELECT * FROM events');
-      events = result.rows;
+      events = events.filter(ev => ev.city === city || ev.sessions.some(s => s.city === city));
     }
     
     res.json(events || []);
