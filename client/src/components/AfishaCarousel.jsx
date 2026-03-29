@@ -70,9 +70,9 @@ function AfishaCarousel() {
               : (ev.image_url || `https://picsum.photos/600/800?random=${i}`);
 
             return (
-              <Link key={i + '-' + ev.id} to={`/event/${ev.id}`} className="featured-card-link" style={{ textDecoration: 'none', color: 'white', flex: '0 0 340px' }}>
+              <Link key={i + '-' + ev.id} to={`/event/${ev.id}`} className="featured-card-link" style={{ textDecoration: 'none', color: 'white', flex: '0 0 550px' }}>
                 <div className="featured-card" style={{ 
-                  height: '460px', 
+                  height: '350px', 
                   borderRadius: '24px', 
                   overflow: 'hidden', 
                   position: 'relative',
