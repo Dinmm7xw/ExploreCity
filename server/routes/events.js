@@ -247,8 +247,8 @@ router.get('/check/validate', async (req, res) => {
     const { id, user } = req.query;
     
     const result = await pool.query(
-      `SELECT e.title, e.date, e.time, e.location, u.name as user_name, r.status, r.tickets,
-              s.date as session_date, s.time as session_time, s.location as session_location
+      `SELECT e.title, e.date, e.time, e.location, e.city, u.name as user_name, r.status, r.tickets,
+              s.date as session_date, s.time as session_time, s.location as session_location, s.city as session_city
        FROM event_registrations r
        JOIN events e ON r.event_id = e.id
        LEFT JOIN event_sessions s ON r.session_id = s.id

@@ -58,8 +58,8 @@ function CheckTicket() {
           <div style={{ textAlign: 'left', marginTop: '30px', padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
             <p><strong>{t('visitor') || 'Посетитель'}:</strong> {result.details.user_name}</p>
             <p><strong>{t('event') || 'Событие'}:</strong> {result.details.title}</p>
-            <p><strong>{t('date_time') || 'Дата и время'}:</strong> {result.details.date} | {result.details.time}</p>
-            <p><strong>{t('location') || 'Место'}:</strong> {result.details.location}</p>
+            <p><strong>{t('date_time') || 'Дата и время'}:</strong> {result.details.session_date || result.details.date} | {result.details.session_time || result.details.time}</p>
+            <p><strong>{t('location') || 'Место'}:</strong> {result.details.session_city || result.details.city}, {result.details.session_location || result.details.location}</p>
             <p><strong>{t('ticket_count_label') || 'Кол-во билетов'}:</strong> {result.details.tickets}</p>
             <p><strong>{t('status') || 'Статус'}:</strong> <span style={{ color: result.valid ? '#2ecc71' : '#e74c3c', fontWeight: 'bold' }}>{result.details.status}</span></p>
           </div>
