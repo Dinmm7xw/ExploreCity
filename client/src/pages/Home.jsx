@@ -9,7 +9,7 @@ function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [city, setCity] = useState('Almaty');
+  const [city, setCity] = useState('All');
 
   const popularCities = [
     { name: "Almaty", icon: "fa-city" },
