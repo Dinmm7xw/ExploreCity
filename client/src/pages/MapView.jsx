@@ -16,6 +16,28 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+const CITY_COORDS = {
+  "Astana": [51.1694, 71.4491],
+  "Almaty": [43.2389, 76.8897],
+  "Shymkent": [42.3155, 69.5869],
+  "Karaganda": [49.8019, 73.1021],
+  "Aktobe": [50.2839, 57.1670],
+  "Taraz": [42.9000, 71.3667],
+  "Pavlodar": [52.3156, 76.9564],
+  "Oskemen": [49.9483, 82.6279],
+  "Semey": [50.4114, 80.2275],
+  "Atyrau": [47.1167, 51.8833],
+  "Kyzylorda": [44.8486, 65.4822],
+  "Kostanay": [53.2198, 63.6283],
+  "Oral": [51.2333, 51.3667],
+  "Petropavl": [54.8753, 69.1628],
+  "Aktau": [43.6481, 51.1610],
+  "Turkistan": [43.2973, 68.2518],
+  "Kokshetau": [53.2824, 69.3969],
+  "Taldykorgan": [45.0156, 78.3739],
+  "Zhezkazgan": [47.7833, 67.7667]
+};
+
 function MapView({ embedded = false, activeCity = 'All' }) {
   const { t } = useTranslation();
   const [events, setEvents] = React.useState([]);
@@ -111,7 +133,11 @@ function MapView({ embedded = false, activeCity = 'All' }) {
         const bounds = L.latLngBounds(markers);
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
       } else {
-        map.setView([48.0196, 66.9237], 5);
+        if (activeCity !== 'All' && CITY_COORDS[activeCity]) {
+          map.setView(CITY_COORDS[activeCity], 12);
+        } else {
+          map.setView([48.0196, 66.9237], 5);
+        }
       }
 
       mapInstance.current = map;
