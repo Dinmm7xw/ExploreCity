@@ -147,9 +147,6 @@ export const initDb = async () => {
           ALTER TABLE events ADD COLUMN longitude DECIMAL(11, 8);
         END IF;
       END $$;
-      
-      -- Проставляем координаты по умолчанию для старых записей (центр Алматы)
-      UPDATE events SET latitude = 43.238949, longitude = 76.889709 WHERE latitude IS NULL;
     `);
 
     // Создание таблицы отзывов (Задача 4)

@@ -36,14 +36,18 @@ function AddEvent() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'location' && LOCATION_COORDS[value]) {
-      setFormData({
-        ...formData, 
-        location: value, 
-        latitude: LOCATION_COORDS[value].lat, 
-        longitude: LOCATION_COORDS[value].lng,
-        city: LOCATION_COORDS[value].city
-      });
+    if (name === 'location') {
+      if (LOCATION_COORDS[value]) {
+        setFormData({
+          ...formData, 
+          location: value, 
+          latitude: LOCATION_COORDS[value].lat, 
+          longitude: LOCATION_COORDS[value].lng,
+          city: LOCATION_COORDS[value].city
+        });
+      } else {
+        setFormData({...formData, location: value, latitude: '', longitude: ''});
+      }
     } else {
       setFormData({...formData, [name]: value});
     }
