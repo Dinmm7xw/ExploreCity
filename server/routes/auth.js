@@ -119,7 +119,8 @@ router.post('/forgot-password', async (req, res) => {
       [token, expiry, email]
     );
 
-    const resetUrl = `${process.env.VITE_BASE_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+    const clientUrl = req.headers.origin || process.env.VITE_BASE_URL || 'http://localhost:3000';
+    const resetUrl = `${clientUrl}/reset-password?token=${token}`;
 
     await sendEmail(
       email,

@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="kk">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Explore The Great Places | Қалалық мәдени іс-шаралар</title>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap"
+    rel="stylesheet">
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -191,7 +194,7 @@
       justify-content: center;
       margin: 0 auto 14px;
       border: 1px solid #f0e2d6;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
     }
 
     .city-icon-circle i {
@@ -266,7 +269,7 @@
       position: absolute;
       bottom: 14px;
       right: 16px;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(4px);
       padding: 5px 12px;
       border-radius: 30px;
@@ -362,7 +365,7 @@
       padding: 10px 20px;
       text-align: center;
       min-width: 75px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
     }
 
     .event-date .day-num {
@@ -413,221 +416,228 @@
       .container {
         padding: 0 24px;
       }
+
       .search-card {
         flex-direction: column;
         align-items: stretch;
         border-radius: 40px;
         padding: 18px;
       }
+
       .city-divider {
         justify-content: center;
         border-left: none;
         background: #f4efe9;
       }
+
       .hero-content h1 {
         font-size: 38px;
       }
+
       .listings-container {
         grid-template-columns: 1fr;
       }
+
       .flex-events {
         flex-direction: column;
       }
     }
   </style>
 </head>
+
 <body>
 
-<!-- HERO: дәл суреттегі "Explore the great places" + "Find Anything... Almaty SEARCH" -->
-<div class="hero">
-  <div class="container">
-    <div class="hero-content">
-      <h1>Explore the great places</h1>
-      <p>Let's discover some great stuff & places for entertainment, eat & shop</p>
-      
-      <!-- Іздеу жолағы - дәл суреттегідей "Find Anything...", "Almaty", "SEARCH" -->
-      <div class="search-card">
-        <div class="search-input-area">
-          <i class="fas fa-search"></i>
-          <input type="text" id="searchInput" placeholder="Find Anything...">
+  <!-- HERO: дәл суреттегі "Explore the great places" + "Find Anything... Almaty SEARCH" -->
+  <div class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Explore the great places</h1>
+        <p>Let's discover some great stuff & places for entertainment, eat & shop</p>
+
+        <!-- Іздеу жолағы - дәл суреттегідей "Find Anything...", "Almaty", "SEARCH" -->
+        <div class="search-card">
+          <div class="search-input-area">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Find Anything...">
+          </div>
+          <div class="city-divider">
+            <i class="fas fa-map-marker-alt"></i>
+            <select id="citySelect">
+              <option value="Almaty">Almaty</option>
+              <option value="Astana">Astana</option>
+              <option value="Shymkent">Shymkent</option>
+              <option value="Bangkok">Bangkok</option>
+              <option value="London">London</option>
+              <option value="New-York">New-York</option>
+              <option value="Paris">Paris</option>
+              <option value="Tokyo">Tokyo</option>
+            </select>
+          </div>
+          <button class="search-button" id="searchBtn">SEARCH</button>
         </div>
-        <div class="city-divider">
-          <i class="fas fa-map-marker-alt"></i>
-          <select id="citySelect">
-            <option value="Almaty">Almaty</option>
-            <option value="Astana">Astana</option>
-            <option value="Shymkent">Shymkent</option>
-            <option value="Bangkok">Bangkok</option>
-            <option value="London">London</option>
-            <option value="New-York">New-York</option>
-            <option value="Paris">Paris</option>
-            <option value="Tokyo">Tokyo</option>
-          </select>
+        <div id="searchFeedback" style="margin-top: 20px; font-size: 14px; color: #c17b4c; font-weight: 500;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPULAR CITIES бөлімі - суреттегі 6 қала -->
+  <div class="cities-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Places & Cities Must Visit This Summer</h2>
+        <p>Popular Cities</p>
+      </div>
+      <div class="cities-list" id="citiesGrid"></div>
+    </div>
+  </div>
+
+  <!-- FEATURED LISTINGS бөлімі - Explore The Best & Famous Things -->
+  <div class="featured-section" id="featured">
+    <div class="container">
+      <div class="featured-head">
+        <h2>Explore The Best & Famous Things</h2>
+        <p>Featured Listings</p>
+      </div>
+      <div class="listings-container" id="listingsGrid"></div>
+    </div>
+  </div>
+
+  <!-- Қосымша мәдени іс-шаралар блогы (жазғы оқиғалар) -->
+  <div class="container">
+    <div class="cultural-wrap">
+      <div class="flex-events">
+        <div class="events-info">
+          <h3><i class="fas fa-calendar-alt" style="color:#c17b4c;"></i> Summer Cultural Events</h3>
+          <p>Қалалық мәдени іс-шаралар: концерттер, көрмелер, театр қойылымдары</p>
+          <div class="event-list-small" id="eventsList"></div>
+          <button class="btn-events" id="allEventsBtn"><i class="fas fa-ticket-alt"></i> Барлық шаралар</button>
         </div>
-        <button class="search-button" id="searchBtn">SEARCH</button>
-      </div>
-      <div id="searchFeedback" style="margin-top: 20px; font-size: 14px; color: #c17b4c; font-weight: 500;"></div>
-    </div>
-  </div>
-</div>
-
-<!-- POPULAR CITIES бөлімі - суреттегі 6 қала -->
-<div class="cities-section">
-  <div class="container">
-    <div class="section-title">
-      <h2>Places & Cities Must Visit This Summer</h2>
-      <p>Popular Cities</p>
-    </div>
-    <div class="cities-list" id="citiesGrid"></div>
-  </div>
-</div>
-
-<!-- FEATURED LISTINGS бөлімі - Explore The Best & Famous Things -->
-<div class="featured-section" id="featured">
-  <div class="container">
-    <div class="featured-head">
-      <h2>Explore The Best & Famous Things</h2>
-      <p>Featured Listings</p>
-    </div>
-    <div class="listings-container" id="listingsGrid"></div>
-  </div>
-</div>
-
-<!-- Қосымша мәдени іс-шаралар блогы (жазғы оқиғалар) -->
-<div class="container">
-  <div class="cultural-wrap">
-    <div class="flex-events">
-      <div class="events-info">
-        <h3><i class="fas fa-calendar-alt" style="color:#c17b4c;"></i> Summer Cultural Events</h3>
-        <p>Қалалық мәдени іс-шаралар: концерттер, көрмелер, театр қойылымдары</p>
-        <div class="event-list-small" id="eventsList"></div>
-        <button class="btn-events" id="allEventsBtn"><i class="fas fa-ticket-alt"></i> Барлық шаралар</button>
-      </div>
-      <div style="flex: 0.9;">
-        <img src="https://picsum.photos/id/104/450/320" alt="cultural festival" style="width: 100%; border-radius: 32px; object-fit: cover; box-shadow: 0 12px 20px rgba(0,0,0,0.08);">
+        <div style="flex: 0.9;">
+          <img src="https://picsum.photos/id/104/450/320" alt="cultural festival"
+            style="width: 100%; border-radius: 32px; object-fit: cover; box-shadow: 0 12px 20px rgba(0,0,0,0.08);">
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<footer class="footer">
-  <div class="container">
-    <div class="social-links">
-      <a href="#"><i class="fab fa-instagram"></i></a>
-      <a href="#"><i class="fab fa-telegram"></i></a>
-      <a href="#"><i class="fab fa-twitter"></i></a>
-      <a href="#"><i class="fab fa-youtube"></i></a>
+  <footer class="footer">
+    <div class="container">
+      <div class="social-links">
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-telegram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+      <p>© 2026 ExploreCulture — Қалалық мәдени іс-шаралар порталы | Ең үздік орындар мен шаралар</p>
     </div>
-    <p>© 2026 ExploreCulture — Қалалық мәдени іс-шаралар порталы | Ең үздік орындар мен шаралар</p>
-  </div>
-</footer>
+  </footer>
 
-<script>
-  // Танымал қалалар - суреттегі 6 қала
-  const citiesData = [
-    { name: "Almaty", country: "Kazakhstan", icon: "fa-mountain-city" },
-    { name: "Bangkok", country: "Thailand", icon: "fa-umbrella-beach" },
-    { name: "London", country: "United Kingdom", icon: "fa-building" },
-    { name: "New-York", country: "United States", icon: "fa-city" },
-    { name: "Paris", country: "France", icon: "fa-landmark" },
-    { name: "Tokyo", country: "Japan", icon: "fa-tree" }
-  ];
+  <script>
+    // Танымал қалалар - суреттегі 6 қала
+    const citiesData = [
+      { name: "Almaty", country: "Kazakhstan", icon: "fa-mountain-city" },
+      { name: "Bangkok", country: "Thailand", icon: "fa-umbrella-beach" },
+      { name: "London", country: "United Kingdom", icon: "fa-building" },
+      { name: "New-York", country: "United States", icon: "fa-city" },
+      { name: "Paris", country: "France", icon: "fa-landmark" },
+      { name: "Tokyo", country: "Japan", icon: "fa-tree" }
+    ];
 
-  // Featured listings - мәдени орындар мен іс-шаралар
-  const featuredListings = [
-    {
-      title: "Almaty Opera & Ballet Theatre",
-      category: "Театр & Өнер",
-      location: "Almaty, Abay Ave",
-      rating: "4.9",
-      desc: "Классикалық опера, балет және симфониялық концерттер. Қазақ өнерінің ордасы.",
-      img: "https://picsum.photos/id/20/400/220"
-    },
-    {
-      title: "Kok Tobe Art & Jazz Hub",
-      category: "Көру & Демалыс",
-      location: "Almaty, Kok-Tobe",
-      rating: "4.8",
-      desc: "Галереялар, джаз кештері және қаланың ең әдемі панорамасы.",
-      img: "https://picsum.photos/id/96/400/220"
-    },
-    {
-      title: "Astana Opera House",
-      category: "Мәдени орталық",
-      location: "Astana, Mangilik El",
-      rating: "4.9",
-      desc: "Халықаралық фестивальдар мен опера премьералары.",
-      img: "https://picsum.photos/id/42/400/220"
-    },
-    {
-      title: "Shymkent Ethno Village",
-      category: "Этно-мәдениет",
-      location: "Shymkent, Kenata",
-      rating: "4.7",
-      desc: "Ұлттық қолөнер, дәмхана, фольклорлық бағдарламалар.",
-      img: "https://picsum.photos/id/30/400/220"
-    },
-    {
-      title: "Jazz & Art Summer Fest",
-      category: "Музыкалық іс-шара",
-      location: "Almaty, Dostyk Plaza",
-      rating: "4.9",
-      desc: "Ашық аспан астында джаз, импровизация және заманауи өнер.",
-      img: "https://picsum.photos/id/155/400/220"
-    },
-    {
-      title: "Great Steppe Exhibition",
-      category: "Көрме",
-      location: "National Museum",
-      rating: "4.8",
-      desc: "Көшпенділер мұрасы, зергерлік, сақ алтыны көрмесі.",
-      img: "https://picsum.photos/id/104/400/220"
-    }
-  ];
+    // Featured listings - мәдени орындар мен іс-шаралар
+    const featuredListings = [
+      {
+        title: "Almaty Opera & Ballet Theatre",
+        category: "Театр & Өнер",
+        location: "Almaty, Abay Ave",
+        rating: "4.9",
+        desc: "Классикалық опера, балет және симфониялық концерттер. Қазақ өнерінің ордасы.",
+        img: "https://picsum.photos/id/20/400/220"
+      },
+      {
+        title: "Kok Tobe Art & Jazz Hub",
+        category: "Көру & Демалыс",
+        location: "Almaty, Kok-Tobe",
+        rating: "4.8",
+        desc: "Галереялар, джаз кештері және қаланың ең әдемі панорамасы.",
+        img: "https://picsum.photos/id/96/400/220"
+      },
+      {
+        title: "Astana Opera House",
+        category: "Мәдени орталық",
+        location: "Astana, Mangilik El",
+        rating: "4.9",
+        desc: "Халықаралық фестивальдар мен опера премьералары.",
+        img: "https://picsum.photos/id/42/400/220"
+      },
+      {
+        title: "Shymkent Ethno Village",
+        category: "Этно-мәдениет",
+        location: "Shymkent, Kenata",
+        rating: "4.7",
+        desc: "Ұлттық қолөнер, дәмхана, фольклорлық бағдарламалар.",
+        img: "https://picsum.photos/id/30/400/220"
+      },
+      {
+        title: "Jazz & Art Summer Fest",
+        category: "Музыкалық іс-шара",
+        location: "Almaty, Dostyk Plaza",
+        rating: "4.9",
+        desc: "Ашық аспан астында джаз, импровизация және заманауи өнер.",
+        img: "https://picsum.photos/id/155/400/220"
+      },
+      {
+        title: "Great Steppe Exhibition",
+        category: "Көрме",
+        location: "National Museum",
+        rating: "4.8",
+        desc: "Көшпенділер мұрасы, зергерлік, сақ алтыны көрмесі.",
+        img: "https://picsum.photos/id/104/400/220"
+      }
+    ];
 
-  // Жазғы іс-шаралар (мәдени)
-  const summerCulturalEvents = [
-    { day: "15", month: "MAU", title: "Jazz Night: Qazaq Fusion", time: "19:00" },
-    { day: "18", month: "MAU", title: "Theatre Night: Love Story", time: "18:30" },
-    { day: "22", month: "MAU", title: "Etnofest: Nomad Spirit", time: "12:00" },
-    { day: "28", month: "MAU", title: "Symphony: Mozart & Kurmangazy", time: "20:00" }
-  ];
+    // Жазғы іс-шаралар (мәдени)
+    const summerCulturalEvents = [
+      { day: "15", month: "MAU", title: "Jazz Night: Qazaq Fusion", time: "19:00" },
+      { day: "18", month: "MAU", title: "Theatre Night: Love Story", time: "18:30" },
+      { day: "22", month: "MAU", title: "Etnofest: Nomad Spirit", time: "12:00" },
+      { day: "28", month: "MAU", title: "Symphony: Mozart & Kurmangazy", time: "20:00" }
+    ];
 
-  // Рендер қалалар
-  function renderCities() {
-    const grid = document.getElementById('citiesGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    citiesData.forEach(city => {
-      const cityDiv = document.createElement('div');
-      cityDiv.className = 'city-block';
-      cityDiv.innerHTML = `
+    // Рендер қалалар
+    function renderCities() {
+      const grid = document.getElementById('citiesGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      citiesData.forEach(city => {
+        const cityDiv = document.createElement('div');
+        cityDiv.className = 'city-block';
+        cityDiv.innerHTML = `
         <div class="city-icon-circle">
           <i class="fas ${city.icon}"></i>
         </div>
         <h3>${city.name}</h3>
         <p>${city.country}</p>
       `;
-      cityDiv.addEventListener('click', () => {
-        const citySelect = document.getElementById('citySelect');
-        if (citySelect) {
-          citySelect.value = city.name;
-          document.getElementById('searchFeedback').innerHTML = `<i class="fas fa-check-circle"></i> Қала таңдалды: ${city.name}. Іздеу батырмасын басыңыз.`;
-        }
+        cityDiv.addEventListener('click', () => {
+          const citySelect = document.getElementById('citySelect');
+          if (citySelect) {
+            citySelect.value = city.name;
+            document.getElementById('searchFeedback').innerHTML = `<i class="fas fa-check-circle"></i> Қала таңдалды: ${city.name}. Іздеу батырмасын басыңыз.`;
+          }
+        });
+        grid.appendChild(cityDiv);
       });
-      grid.appendChild(cityDiv);
-    });
-  }
+    }
 
-  // Рендер featured listings
-  function renderFeatured() {
-    const container = document.getElementById('listingsGrid');
-    if (!container) return;
-    container.innerHTML = '';
-    featuredListings.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'listing-item';
-      card.innerHTML = `
+    // Рендер featured listings
+    function renderFeatured() {
+      const container = document.getElementById('listingsGrid');
+      if (!container) return;
+      container.innerHTML = '';
+      featuredListings.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'listing-item';
+        card.innerHTML = `
         <div class="listing-img" style="background-image: url('${item.img}');">
           <div class="rating-badge"><i class="fas fa-star"></i> ${item.rating}</div>
         </div>
@@ -641,25 +651,25 @@
           <a href="#" class="detail-link">Толығырақ <i class="fas fa-arrow-right"></i></a>
         </div>
       `;
-      container.appendChild(card);
-    });
-    document.querySelectorAll('.detail-link').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Бұл мәдени орын туралы толық ақпарат жақын арада қосылады!');
+        container.appendChild(card);
       });
-    });
-  }
+      document.querySelectorAll('.detail-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert('Бұл мәдени орын туралы толық ақпарат жақын арада қосылады!');
+        });
+      });
+    }
 
-  // Рендер іс-шаралар
-  function renderEvents() {
-    const eventsContainer = document.getElementById('eventsList');
-    if (!eventsContainer) return;
-    eventsContainer.innerHTML = '';
-    summerCulturalEvents.forEach(ev => {
-      const eventRow = document.createElement('div');
-      eventRow.className = 'event-single';
-      eventRow.innerHTML = `
+    // Рендер іс-шаралар
+    function renderEvents() {
+      const eventsContainer = document.getElementById('eventsList');
+      if (!eventsContainer) return;
+      eventsContainer.innerHTML = '';
+      summerCulturalEvents.forEach(ev => {
+        const eventRow = document.createElement('div');
+        eventRow.className = 'event-single';
+        eventRow.innerHTML = `
         <div class="event-date">
           <div class="day-num">${ev.day}</div>
           <div style="font-size:10px; font-weight:600;">${ev.month}</div>
@@ -669,57 +679,58 @@
           <div style="font-size:13px; color:#9b7b64;"><i class="far fa-clock"></i> ${ev.time}</div>
         </div>
       `;
-      eventsContainer.appendChild(eventRow);
+        eventsContainer.appendChild(eventRow);
+      });
+    }
+
+    // Іздеу функциясы (Find Anything...)
+    function handleSearch() {
+      const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+      const selectedCity = document.getElementById('citySelect').value;
+      const feedbackDiv = document.getElementById('searchFeedback');
+
+      let filtered = featuredListings.filter(item =>
+        item.title.toLowerCase().includes(searchTerm) ||
+        item.category.toLowerCase().includes(searchTerm) ||
+        item.desc.toLowerCase().includes(searchTerm) ||
+        item.location.toLowerCase().includes(searchTerm)
+      );
+
+      if (searchTerm === "") {
+        feedbackDiv.innerHTML = `<i class="fas fa-map-pin"></i> Қазіргі қала: ${selectedCity}. Таңдаулы ұсыныстар төменде.`;
+      }
+      else if (filtered.length > 0) {
+        feedbackDiv.innerHTML = `<i class="fas fa-check-circle"></i> "${searchTerm}" бойынша ${filtered.length} нәтиже табылды. Қала: ${selectedCity}`;
+        document.getElementById('featured').scrollIntoView({ behavior: 'smooth' });
+      }
+      else {
+        feedbackDiv.innerHTML = `<i class="fas fa-info-circle"></i> "${searchTerm}" бойынша ештеңе табылмады. Басқа іс-шараларды қараңыз.`;
+      }
+
+      // Қалалық мәдени іс-шаралар туралы қосымша
+      if (selectedCity === "Almaty" || selectedCity === "Astana" || selectedCity === "Shymkent") {
+        feedbackDiv.innerHTML += `<br><i class="fas fa-calendar-week"></i> ${selectedCity} қаласында бүгін 5+ мәдени шара өтеді!`;
+      }
+    }
+
+    // All Events button
+    document.getElementById('allEventsBtn').addEventListener('click', () => {
+      alert('Барлық жазғы мәдени іс-шаралар күнтізбесі жақын арада іске қосылады. Бізбен бірге болыңыз! 🎭🎶');
     });
-  }
 
-  // Іздеу функциясы (Find Anything...)
-  function handleSearch() {
-    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
-    const selectedCity = document.getElementById('citySelect').value;
+    document.getElementById('searchBtn').addEventListener('click', handleSearch);
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSearch();
+    });
+
+    // Инициализация
+    renderCities();
+    renderFeatured();
+    renderEvents();
+
     const feedbackDiv = document.getElementById('searchFeedback');
-    
-    let filtered = featuredListings.filter(item => 
-      item.title.toLowerCase().includes(searchTerm) || 
-      item.category.toLowerCase().includes(searchTerm) ||
-      item.desc.toLowerCase().includes(searchTerm) ||
-      item.location.toLowerCase().includes(searchTerm)
-    );
-    
-    if (searchTerm === "") {
-      feedbackDiv.innerHTML = `<i class="fas fa-map-pin"></i> Қазіргі қала: ${selectedCity}. Таңдаулы ұсыныстар төменде.`;
-    } 
-    else if (filtered.length > 0) {
-      feedbackDiv.innerHTML = `<i class="fas fa-check-circle"></i> "${searchTerm}" бойынша ${filtered.length} нәтиже табылды. Қала: ${selectedCity}`;
-      document.getElementById('featured').scrollIntoView({ behavior: 'smooth' });
-    } 
-    else {
-      feedbackDiv.innerHTML = `<i class="fas fa-info-circle"></i> "${searchTerm}" бойынша ештеңе табылмады. Басқа іс-шараларды қараңыз.`;
-    }
-    
-    // Қалалық мәдени іс-шаралар туралы қосымша
-    if (selectedCity === "Almaty" || selectedCity === "Astana" || selectedCity === "Shymkent") {
-      feedbackDiv.innerHTML += `<br><i class="fas fa-calendar-week"></i> ${selectedCity} қаласында бүгін 5+ мәдени шара өтеді!`;
-    }
-  }
-
-  // All Events button
-  document.getElementById('allEventsBtn').addEventListener('click', () => {
-    alert('Барлық жазғы мәдени іс-шаралар күнтізбесі жақын арада іске қосылады. Бізбен бірге болыңыз! 🎭🎶');
-  });
-  
-  document.getElementById('searchBtn').addEventListener('click', handleSearch);
-  document.getElementById('searchInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleSearch();
-  });
-  
-  // Инициализация
-  renderCities();
-  renderFeatured();
-  renderEvents();
-  
-  const feedbackDiv = document.getElementById('searchFeedback');
-  if (feedbackDiv) feedbackDiv.innerHTML = '<i class="fas fa-lightbulb"></i> Іс-шара, орын атауын іздеңіз. Мысалы: Jazz, театр, музей';
-</script>
+    if (feedbackDiv) feedbackDiv.innerHTML = '<i class="fas fa-lightbulb"></i> Іс-шара, орын атауын іздеңіз. Мысалы: Jazz, театр, музей';
+  </script>
 </body>
+
 </html>
