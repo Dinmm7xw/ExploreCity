@@ -7,6 +7,7 @@ function ForgotPassword() {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
+    const [testUrl, setTestUrl] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -14,6 +15,7 @@ function ForgotPassword() {
         e.preventDefault();
         setLoading(true);
         setMessage('');
+        setTestUrl('');
         setError('');
 
         try {
@@ -25,6 +27,7 @@ function ForgotPassword() {
             const data = await res.json();
             if (res.ok) {
                 setMessage(t('forgot_pass_success') || data.message);
+                if (data.testUrl) setTestUrl(data.testUrl);
             } else {
                 setError(data.message);
             }
@@ -43,7 +46,18 @@ function ForgotPassword() {
                     {t('forgot_password_desc')}
                 </p>
 
-                {message && <div style={{ color: '#2ecc71', marginBottom: '20px', textAlign: 'center' }}>{message}</div>}
+                {message && (
+                    <div style={{ color: '#2ecc71', marginBottom: '20px', textAlign: 'center', background: 'rgba(46, 204, 113, 0.1)', padding: '15px', borderRadius: '10px' }}>
+                        <div>{message}</div>
+                    </div>
+                )}
+
+                {testUrl && (
+                    <div style={{ marginBottom: '20px', textAlign: 'center', background: 'rgba(193, 123, 76, 0.1)', padding: '15px', borderRadius: '10px' }}>
+                        <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--text-muted)' }}>В демо-режиме (без почты) используйте ссылку ниже:</p>
+                        <a href={testUrl} style={{ color: 'var(--primary)', fontWeight: 'bold', wordBreak: 'break-all' }}>Перейти к сбросу пароля</a>
+                    </div>
+                )}
                 {error && <div style={{ color: '#e74c3c', marginBottom: '20px', textAlign: 'center' }}>{error}</div>}
 
                 <form onSubmit={handleSubmit}>
