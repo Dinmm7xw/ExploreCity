@@ -122,7 +122,9 @@ router.post('/forgot-password', async (req, res) => {
     const clientUrl = req.headers.origin || process.env.VITE_BASE_URL || 'http://localhost:3000';
     const resetUrl = `${clientUrl}/reset-password?token=${token}`;
 
-    await sendEmail(
+    // Вызываем отправку письма без await, чтобы не блокировать UI на долгие минуты,
+    // если бесплатный сервер Render тормозит исходящие SMTP-запросы.
+    sendEmail(
       email,
       'Восстановление пароля - ExploreCity',
       `Для сброса пароля перейдите по ссылке: ${resetUrl}`,
@@ -130,9 +132,14 @@ router.post('/forgot-password', async (req, res) => {
        <p>Вы получили это письмо, потому что запросили сброс пароля для вашего аккаунта в ExploreCity.</p>
        <p><a href="${resetUrl}" style="background: #c17b4c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Сбросить пароль</a></p>
        <p>Ссылка действительна в течение одного часа.</p>`
-    );
+    ).catch(err => console.error('Background email error:', err));
 
-    res.json({ message: 'Ссылка для восстановления отправлена на почту.' });
+    res.json({
+      message: 'Ссылка для восстановления отправлена на почту.',
+      // Временно отправляем ссылку во фронтенд для удобства тестирования,
+      // так как бесплатные облака (Render) часто жестко блокируют порты Mail.ru
+      testUrl: resetUrl
+    });
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ message: 'Ошибка сервера' });
