@@ -18,6 +18,7 @@
   margin-bottom: 16px;
   background: linear-gradient(90deg, #1e2e2a 0%, #c17b4c 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -26,6 +27,20 @@
   color: var(--text-muted);
   margin-bottom: 50px;
   font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 34px !important;
+    line-height: 1.2;
+  }
+  .hero {
+    padding: 60px 0 40px;
+  }
+  .hero-content p {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
 }
 
 .search-card {
@@ -88,6 +103,23 @@
 .search-button {
   padding: 14px 40px;
   font-size: 16px;
+}
+
+@media (max-width: 600px) {
+  .search-card {
+    border-radius: 20px;
+    padding: 10px;
+  }
+  .search-input-area {
+    padding: 0 10px;
+  }
+  .search-input-area input {
+    font-size: 14px;
+    padding: 12px 0;
+  }
+  .city-divider select {
+    font-size: 14px;
+  }
 }
 
 /* Cities Section */

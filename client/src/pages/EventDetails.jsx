@@ -160,7 +160,7 @@ function EventDetails({ isAuthenticated }) {
   return (
     <div className="container" style={{ padding: '40px 20px' }}>
       <div className="glass-card" style={{ overflow: 'hidden' }}>
-        <div style={{ position: 'relative', height: '400px', backgroundColor: '#f0f0f0', overflow: 'hidden' }}>
+        <div className="mobile-h-250" style={{ position: 'relative', height: '400px', backgroundColor: '#f0f0f0', overflow: 'hidden' }}>
           {(() => {
             const isYt = event.image_url && (event.image_url.includes('youtube.com') || event.image_url.includes('youtu.be'));
             const ytId = isYt ? event.image_url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|u\/\w\/|embed\/|watch\?v=))([^#&?]*)/)?.[1] : null;
@@ -193,9 +193,9 @@ function EventDetails({ isAuthenticated }) {
           </div>
         </div>
         
-        <div style={{ padding: '40px' }}>
+        <div className="mobile-p-20" style={{ padding: '40px' }}>
           <h1 style={{ fontSize: '36px', marginBottom: '16px', color: 'var(--text-main)' }}>{event.title}</h1>
-          <div style={{ display: 'flex', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
+          <div className="stack-mobile" style={{ display: 'flex', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
             <span style={{background: 'rgba(193, 123, 76, 0.1)', padding: '8px 16px', borderRadius: '20px', color: 'var(--primary)', fontWeight: 'bold'}}><i className="fas fa-tag"></i> {event.category}</span>
             <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="fas fa-location-dot" style={{color: 'var(--primary)'}}></i> {selectedSession ? `${selectedSession.city}, ${selectedSession.location}` : `${event.city}, ${event.location}`}</span>
             <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="far fa-calendar-alt" style={{color: 'var(--primary)'}}></i> {selectedSession ? `${selectedSession.date} ${selectedSession.time ? `в ${selectedSession.time}` : ''}` : `${event.date} ${event.time ? `в ${event.time}` : ''}`}</span>
@@ -262,7 +262,7 @@ function EventDetails({ isAuthenticated }) {
             })()}
           </div>
 
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+          <div className="stack-mobile" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             {isAuthenticated && (
               <button className="btn-primary" style={{ background: '#2ecc71', color: 'white' }} onClick={() => navigate(selectedSession && selectedSession.id !== 'master' ? `/event/${id}/register?session=${selectedSession.id}` : `/event/${id}/register`)}>
                 <i className="fas fa-ticket-alt"></i> {t('book_ticket')}
@@ -270,10 +270,10 @@ function EventDetails({ isAuthenticated }) {
             )}
             {canModify && (
               <>
-                <button className="btn-primary" style={{ background: '#f39c12' }} onClick={() => navigate(`/edit-event/${id}`)}>
+                <button className="btn-primary" style={{ background: '#f39c12', display: 'flex', justifyContent: 'center' }} onClick={() => navigate(`/edit-event/${id}`)}>
                   <i className="fas fa-edit"></i> {t('edit_btn')}
                 </button>
-                <button className="btn-primary" style={{ background: '#e74c3c' }} onClick={handleDelete}>
+                <button className="btn-primary" style={{ background: '#e74c3c', display: 'flex', justifyContent: 'center' }} onClick={handleDelete}>
                   <i className="fas fa-trash"></i> {t('delete_btn')}
                 </button>
               </>

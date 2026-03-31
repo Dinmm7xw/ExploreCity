@@ -122,8 +122,8 @@ router.post('/forgot-password', async (req, res) => {
     const clientUrl = req.headers.origin || process.env.VITE_BASE_URL || 'http://localhost:3000';
     const resetUrl = `${clientUrl}/reset-password?token=${token}`;
 
-    // Вызываем отправку письма без await, чтобы не блокировать UI на долгие минуты,
-    // если бесплатный сервер Render тормозит исходящие SMTP-запросы.
+
+
     sendEmail(
       email,
       'Восстановление пароля - ExploreCity',
@@ -136,8 +136,8 @@ router.post('/forgot-password', async (req, res) => {
 
     res.json({
       message: 'Ссылка для восстановления отправлена на почту.',
-      // Временно отправляем ссылку во фронтенд для удобства тестирования,
-      // так как бесплатные облака (Render) часто жестко блокируют порты Mail.ru
+
+
       testUrl: resetUrl
     });
   } catch (error) {

@@ -116,7 +116,7 @@ function EventRegister() {
 
   return (
     <div className="container" style={{ padding: '60px 20px', minHeight: '70vh' }}>
-      <div className="glass-card" style={{ maxWidth: '900px', margin: '0 auto', padding: '40px', position: 'relative' }}>
+      <div className="glass-card mobile-p-20" style={{ maxWidth: '900px', margin: '0 auto', padding: '40px', position: 'relative' }}>
         
         {step === 2 && (
             <button 
@@ -140,10 +140,10 @@ function EventRegister() {
         </div>
 
         {step === 1 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: isSeatingEvent ? '1fr 1fr' : '1fr', gap: '40px' }}>
+            <div className="grid-mobile-1" style={{ display: 'grid', gridTemplateColumns: isSeatingEvent ? '1fr 1fr' : '1fr', gap: '40px' }}>
                 {/* Карта/Схема */}
                 {isSeatingEvent && (
-                    <div style={{ borderRight: '1px solid rgba(0,0,0,0.05)', paddingRight: '40px' }}>
+                    <div className="mobile-p-0" style={{ borderRight: '1px solid rgba(0,0,0,0.05)', paddingRight: '40px' }}>
                         <h3 style={{ fontSize: '18px', marginBottom: '20px' }}><i className="fas fa-couch" style={{color: 'var(--primary)'}}></i> Выберите сектор и место:</h3>
                         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                             <svg viewBox="0 0 240 160" style={{ width: '100%', maxWidth: '400px', cursor: 'pointer' }}>

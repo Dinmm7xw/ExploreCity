@@ -29,8 +29,13 @@ body {
   padding: 0 20px;
 }
 
-main {
-  padding-top: 80px; 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+  main {
+    padding-top: 70px;
+  }
 }
 
 /* Premium Card / Glassmorphism */
@@ -145,6 +150,41 @@ main {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Mobile Typography */
+@media (max-width: 600px) {
+  h1 { font-size: 28px !important; }
+  h2 { font-size: 24px !important; }
+  h3 { font-size: 20px !important; }
+  .btn-primary { padding: 10px 20px; font-size: 14px; }
+  
+  .stack-mobile {
+    flex-direction: column !important;
+  }
+  .grid-mobile-1 {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  .mobile-p-20 {
+    padding: 20px !important;
+  }
+  .mobile-h-250 {
+    height: 250px !important;
+  }
+  .mobile-h-400 {
+    height: 400px !important;
+  }
+  .mobile-p-0 {
+    padding: 0 !important;
+    border: none !important;
+  }
+  .mobile-geo-btn {
+    top: 10px !important;
+    right: 10px !important;
+    padding: 8px 15px !important;
+    font-size: 12px !important;
+  }
 }
 
 /* Dark Mode Theme overrides */

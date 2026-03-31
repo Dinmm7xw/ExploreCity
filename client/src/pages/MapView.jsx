@@ -196,11 +196,12 @@ function MapView({ embedded = false, activeCity = 'All' }) {
   }, [loading, events, activeCity, t, userLocation]);
 
   const mapContent = (
-      <div className="glass-card" style={{ position: 'relative', padding: '10px', height: embedded ? '500px' : '600px', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
+      <div className="glass-card mobile-h-400" style={{ position: 'relative', padding: '10px', height: embedded ? '500px' : '600px', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
         
         {/* Кнопка активации GPS-Радара */}
         <button 
           onClick={handleGeoLocation}
+          className="mobile-geo-btn"
           style={{
             position: 'absolute', top: '20px', right: '20px', zIndex: 1000,
             padding: '10px 20px', background: userLocation ? '#e74c3c' : 'white',

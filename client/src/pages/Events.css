@@ -1,8 +1,18 @@
 .events-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 32px;
+  gap: 30px;
   margin-top: 40px;
+}
+
+@media (max-width: 600px) {
+  .events-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .event-card {
+    border-radius: 16px !important;
+  }
 }
 
 .event-card {
