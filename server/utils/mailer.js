@@ -7,12 +7,12 @@ dotenv.config();
  */
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.mail.ru',
-  port: 465,
-  secure: true, // true для 465, false для других портов
+  host: process.env.EMAIL_HOST || 'smtp-relay.brevo.com',
+  port: process.env.EMAIL_PORT || 2525, // Используем обходной порт (или 587)
+  secure: false, // false для порта 587/2525, потому что шифрование STARTTLS включится автоматически 
   auth: {
-    user: process.env.EMAIL_USER || 'test.kz0101@mail.ru',
-    pass: process.env.EMAIL_PASS // Пароль из .env
+    user: process.env.EMAIL_USER, // Это будет ваш "Login" с сайта Brevo (обычно почта)
+    pass: process.env.EMAIL_PASS // Это будет САМЫЙ длинный ключ, который вы сейчас получите
   }
 });
 
