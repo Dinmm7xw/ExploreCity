@@ -42,12 +42,37 @@ function MapView({ embedded = false, activeCity = 'All' }) {
   const { t } = useTranslation();
   const [events, setEvents] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [userLocation, setUserLocation] = React.useState(null);
   const mapRef = React.useRef(null);
   const mapInstance = React.useRef(null);
 
   React.useEffect(() => {
     fetchEvents(activeCity);
   }, [activeCity]);
+
+  const handleGeoLocation = () => {
+    if (userLocation) {
+      setUserLocation(null);
+      return;
+    }
+    
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          // Если пользователь нажал "Запретить" доступ к геолокации
+          alert('Не удалось получить гео-позицию. Разрешите доступ к локации в настройках браузера.');
+        }
+      );
+    } else {
+      alert('Ваш браузер не поддерживает GPS (Гео-позицию)');
+    }
+  };
 
   const fetchEvents = async (cityName) => {
     try {
@@ -82,6 +107,13 @@ function MapView({ embedded = false, activeCity = 'All' }) {
       }).addTo(map);
 
       const markers = [];
+      const userLatLng = userLocation ? L.latLng(userLocation.lat, userLocation.lng) : null;
+
+      // 1. Рисуем 5-километровый прозрачный зеленый/синий круг вокруг пользователя (радар)
+      if (userLatLng) {
+        L.circle(userLatLng, { radius: 5000, color: '#3498db', fillOpacity: 0.1, weight: 2 }).addTo(map);
+        L.circleMarker(userLatLng, { radius: 8, color: 'white', fillColor: '#3498db', fillOpacity: 1, weight: 3 }).addTo(map).bindPopup('<b>Вы здесь</b>');
+      }
 
       events.forEach(ev => {
         let bannerUrl = ev.image_url || 'https://picsum.photos/200/100';
@@ -112,6 +144,14 @@ function MapView({ embedded = false, activeCity = 'All' }) {
 
         locationsToPlot.forEach(loc => {
           if (!isNaN(loc.lat) && !isNaN(loc.lng)) {
+            const locLatLng = L.latLng(loc.lat, loc.lng);
+            
+            // Если включен режим Гео-радара, скрываем маркеры дальше 5 км
+            if (userLatLng) {
+              const distance = userLatLng.distanceTo(locLatLng);
+              if (distance > 5000) return; 
+            }
+
             const marker = L.marker([loc.lat, loc.lng]).addTo(map);
             markers.push([loc.lat, loc.lng]); 
             const popupContent = `
@@ -129,7 +169,11 @@ function MapView({ embedded = false, activeCity = 'All' }) {
         });
       });
       
-      if (markers.length > 0) {
+      // Логика центрирования карты
+      if (userLatLng) {
+         // Отдаем приоритет центрированию на пользователя
+         map.setView(userLatLng, 12);
+      } else if (markers.length > 0) {
         const bounds = L.latLngBounds(markers);
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
       } else {
@@ -149,10 +193,30 @@ function MapView({ embedded = false, activeCity = 'All' }) {
         mapInstance.current = null;
       }
     };
-  }, [loading, events, activeCity, t]);
+  }, [loading, events, activeCity, t, userLocation]);
 
   const mapContent = (
-      <div className="glass-card" style={{ padding: '10px', height: embedded ? '500px' : '600px', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
+      <div className="glass-card" style={{ position: 'relative', padding: '10px', height: embedded ? '500px' : '600px', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
+        
+        {/* Кнопка активации GPS-Радара */}
+        <button 
+          onClick={handleGeoLocation}
+          style={{
+            position: 'absolute', top: '20px', right: '20px', zIndex: 1000,
+            padding: '10px 20px', background: userLocation ? '#e74c3c' : 'white',
+            color: userLocation ? 'white' : 'var(--primary)', 
+            borderRadius: '30px', border: 'none', cursor: 'pointer',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.2)', fontWeight: 'bold', 
+            display: 'flex', alignItems: 'center', gap: '8px', transition: '0.3s'
+          }}
+        >
+          {userLocation ? (
+            <><i className="fas fa-times"></i> Сбросить радар</>
+          ) : (
+            <><i className="fas fa-location-crosshairs"></i> {t('near_me') || 'Рядом (5 км)'}</>
+          )}
+        </button>
+
         {loading ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
             <div className="spinner"></div>
