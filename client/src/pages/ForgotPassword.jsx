@@ -54,8 +54,8 @@ function ForgotPassword() {
 
                 {testUrl && (
                     <div style={{ marginBottom: '20px', textAlign: 'center', background: 'rgba(193, 123, 76, 0.1)', padding: '15px', borderRadius: '10px' }}>
-                        <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--text-muted)' }}>В демо-режиме (без почты) используйте ссылку ниже:</p>
-                        <a href={testUrl} style={{ color: 'var(--primary)', fontWeight: 'bold', wordBreak: 'break-all' }}>Перейти к сбросу пароля</a>
+                        <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--text-muted)' }}>{t('ai_generated')} (Demo):</p>
+                        <a href={testUrl} style={{ color: 'var(--primary)', fontWeight: 'bold', wordBreak: 'break-all' }}>{t('reset_password_btn')}</a>
                     </div>
                 )}
                 {error && <div style={{ color: '#e74c3c', marginBottom: '20px', textAlign: 'center' }}>{error}</div>}

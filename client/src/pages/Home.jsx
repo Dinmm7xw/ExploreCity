@@ -75,7 +75,7 @@ function Home() {
                   <i className={`fas ${c.icon}`}></i>
                 </div>
                 <h3>{c.name}</h3>
-                <p>Kazakhstan</p>
+                <p>{t('kazakhstan')}</p>
               </div>
             ))}
           </div>

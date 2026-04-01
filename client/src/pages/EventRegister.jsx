@@ -50,7 +50,7 @@ function EventRegister() {
       setSelectedSeats(selectedSeats.filter(s => s !== seatCode));
     } else {
       if (selectedSeats.length >= 10) {
-        alert('Максимум 10 билетов на одного человека');
+        alert(t('limit_tickets'));
         return;
       }
       setSelectedSeats([...selectedSeats, seatCode]);
@@ -62,11 +62,11 @@ function EventRegister() {
   const handleNextStep = (e) => {
     e.preventDefault();
     if (!formData.phone) {
-        setError('Пожалуйста, введите ваш номер телефона');
+        setError(t('enter_phone'));
         return;
     }
     if (isSeatingEvent && selectedSeats.length === 0) {
-        setError('Пожалуйста, выберите хотя бы одно место на схеме');
+        setError(t('select_at_least_one'));
         return;
     }
     setError('');
@@ -101,7 +101,7 @@ function EventRegister() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
             
-            alert(data.message || 'Төлем сәтті өтті! Билеттеріңіз дайын. (Оплата прошла успешно!)');
+            alert(t('payment_success'));
             navigate(`/event/${id}`);
           } catch (err) {
             setError(err.message);
@@ -123,7 +123,7 @@ function EventRegister() {
                 onClick={() => setStep(1)} 
                 style={{ position: 'absolute', left: '20px', top: '20px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
             >
-                <i className="fas fa-arrow-left"></i> Назад
+                <i className="fas fa-arrow-left"></i> {t('back_btn')}
             </button>
         )}
 
@@ -134,7 +134,7 @@ function EventRegister() {
                 <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: step === 2 ? 'var(--primary)' : '#eee', color: step === 2 ? 'white' : '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>2</div>
             </div>
             <h2 style={{ fontSize: '32px', marginBottom: '8px' }}>
-                {step === 1 ? 'Бронирование билетов' : 'Оплата заказа'}
+                {step === 1 ? t('booking_tickets') : t('payment_order')}
             </h2>
             <p style={{ color: 'var(--text-muted)' }}>{event.title}</p>
         </div>
@@ -144,7 +144,7 @@ function EventRegister() {
                 {/* Карта/Схема */}
                 {isSeatingEvent && (
                     <div className="mobile-p-0" style={{ borderRight: '1px solid rgba(0,0,0,0.05)', paddingRight: '40px' }}>
-                        <h3 style={{ fontSize: '18px', marginBottom: '20px' }}><i className="fas fa-couch" style={{color: 'var(--primary)'}}></i> Выберите сектор и место:</h3>
+                        <h3 style={{ fontSize: '18px', marginBottom: '20px' }}><i className="fas fa-couch" style={{color: 'var(--primary)'}}></i> {t('select_sector_seat')}</h3>
                         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                             <svg viewBox="0 0 240 160" style={{ width: '100%', maxWidth: '400px', cursor: 'pointer' }}>
                                 <rect x="70" y="50" width="100" height="60" fill="#4CAF50" rx="2" />
@@ -178,7 +178,7 @@ function EventRegister() {
                             </div>
                         ) : (
                             <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(0,0,0,0.02)', borderRadius: '16px', border: '2px dashed rgba(0,0,0,0.05)' }}>
-                                {t('select_sector_hint') || 'Сначала выберите трибуну на карте'}
+                                {t('select_sector_hint')}
                             </div>
                         )}
                     </div>
@@ -187,33 +187,33 @@ function EventRegister() {
                 {/* Поля ввода */}
                 <div>
                     <div style={{ background: 'rgba(193, 123, 76, 0.05)', padding: '24px', borderRadius: '16px', marginBottom: '24px' }}>
-                        <h3 style={{ fontSize: '18px', color: 'var(--primary)', marginBottom: '12px' }}><i className="fas fa-info-circle"></i> Информация</h3>
-                        <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>Город:</strong> {sessionData ? sessionData.city : event.city}</p>
-                        <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>Место:</strong> {sessionData ? sessionData.location : event.location}</p>
-                        <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>Дата:</strong> {sessionData ? sessionData.date : (event.date || 'Уточняется')} в {sessionData ? sessionData.time : (event.time || '')}</p>
-                        <p style={{ fontSize: '14px', color: 'var(--primary)', fontWeight: 'bold', marginTop: '10px' }}>Цена билета: {TICKET_PRICE.toLocaleString()} ₸</p>
+                        <h3 style={{ fontSize: '18px', color: 'var(--primary)', marginBottom: '12px' }}><i className="fas fa-info-circle"></i> {t('order_info')}</h3>
+                        <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>{t('city_label').replace('*', '')}:</strong> {sessionData ? sessionData.city : event.city}</p>
+                        <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>{t('location_label').replace('*', '')}:</strong> {sessionData ? sessionData.location : event.location}</p>
+                        <p style={{ fontSize: '14px', marginBottom: '8px' }}><strong>{t('date_label')}:</strong> {sessionData ? sessionData.date : (event.date || t('coming_soon'))} {t('time_label')} {sessionData ? sessionData.time : (event.time || '')}</p>
+                        <p style={{ fontSize: '14px', color: 'var(--primary)', fontWeight: 'bold', marginTop: '10px' }}>{t('price_label')} {TICKET_PRICE.toLocaleString()} ₸</p>
                     </div>
 
                     {error && <div className="error-msg" style={{marginBottom: '20px'}}>{error}</div>}
 
                     <form onSubmit={handleNextStep} style={{ display: 'grid', gap: '20px' }}>
                         <div>
-                            <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>Ваш номер телефона *</label>
+                            <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('phone_label')}</label>
                             <input type="text" className="input-field" placeholder="+7 (777) 000-00-00" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} required />
                         </div>
                         {!isSeatingEvent ? (
                             <div>
-                                <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>Количество билетов</label>
+                                <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('ticket_count_label')}</label>
                                 <input type="number" className="input-field" min="1" max="10" value={formData.tickets} onChange={(e) => setFormData({...formData, tickets: parseInt(e.target.value)})} />
                             </div>
                         ) : (
                             <div style={{ padding: '20px', background: '#f8f9fa', borderRadius: '16px', border: '1px solid #eee' }}>
-                                <p style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--primary)' }}>Выбрано мест: {selectedSeats.length}</p>
-                                <p style={{ fontSize: '13px', color: '#666', marginTop: '6px' }}>{selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Места не выбраны'}</p>
+                                <p style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--primary)' }}>{t('selected_seats_count')} {selectedSeats.length}</p>
+                                <p style={{ fontSize: '13px', color: '#666', marginTop: '6px' }}>{selectedSeats.length > 0 ? selectedSeats.join(', ') : t('seats_not_selected')}</p>
                             </div>
                         )}
                         <button type="submit" className="btn-primary" style={{justifyContent: 'center', padding: '16px', fontSize: '16px'}}>
-                            Продолжить к оплате ({totalPrice.toLocaleString()} ₸)
+                            {t('continue_payment')} ({totalPrice.toLocaleString()} ₸)
                         </button>
                     </form>
                 </div>
@@ -224,18 +224,18 @@ function EventRegister() {
                 {isProcessing ? (
                     <div style={{ textAlign: 'center', padding: '60px 0' }}>
                         <div className="spinner" style={{ width: '60px', height: '60px', borderWidth: '5px', margin: '0 auto 20px' }}></div>
-                        <h3>Обработка платежа...</h3>
-                        <p style={{ color: 'var(--text-muted)' }}>Пожалуйста, не закрывайте страницу</p>
+                        <h3>{t('processing_payment')}</h3>
+                        <p style={{ color: 'var(--text-muted)' }}>{t('dont_close_page')}</p>
                     </div>
                 ) : (
                     <>
                         <div style={{ background: '#fcfcfc', border: '1px solid #eee', padding: '20px', borderRadius: '16px', marginBottom: '30px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                                <span>Заказ:</span>
+                                <span>{t('order_label')}</span>
                                 <strong>#{Math.floor(Math.random() * 100000)}</strong>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '20px', fontWeight: 'bold', color: 'var(--primary)', borderTop: '1px solid #eee', paddingTop: '10px' }}>
-                                <span>К оплате:</span>
+                                <span>{t('to_pay')}</span>
                                 <span>{totalPrice.toLocaleString()} ₸</span>
                             </div>
                         </div>
@@ -245,13 +245,13 @@ function EventRegister() {
                                 onClick={() => setPaymentMethod('card')}
                                 style={{ flex: 1, padding: '12px', borderRadius: '12px', border: `2px solid ${paymentMethod === 'card' ? 'var(--primary)' : '#eee'}`, background: paymentMethod === 'card' ? 'rgba(193,123,76,0.05)' : 'white', cursor: 'pointer', fontWeight: 'bold' }}
                             >
-                                <i className="fas fa-credit-card"></i> Карта
+                                <i className="fas fa-credit-card"></i> {t('card')}
                             </button>
                             <button 
                                 onClick={() => setPaymentMethod('qr')}
                                 style={{ flex: 1, padding: '12px', borderRadius: '12px', border: `2px solid ${paymentMethod === 'qr' ? 'var(--primary)' : '#eee'}`, background: paymentMethod === 'qr' ? 'rgba(193,123,76,0.05)' : 'white', cursor: 'pointer', fontWeight: 'bold' }}
                             >
-                                <i className="fas fa-qrcode"></i> Kaspi QR
+                                <i className="fas fa-qrcode"></i> {t('kaspi_qr')}
                             </button>
                         </div>
 
@@ -262,12 +262,12 @@ function EventRegister() {
                                     <input type="text" className="input-field" placeholder="ММ / ГГ" />
                                     <input type="text" className="input-field" placeholder="CVC" />
                                 </div>
-                                <p style={{ fontSize: '11px', color: '#999', textAlign: 'center' }}>Все транзакции защищены шифрованием SSL</p>
+                                <p style={{ fontSize: '11px', color: '#999', textAlign: 'center' }}>{t('ssl_hint')}</p>
                             </div>
                         ) : (
                             <div style={{ textAlign: 'center', padding: '20px', background: 'white', borderRadius: '12px', border: '1px solid #eee' }}>
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=KaspiPay" alt="Kaspi QR" style={{ width: '150px', marginBottom: '15px' }} />
-                                <p style={{ fontWeight: 'bold' }}>Отсканируйте и оплатите в приложении Kaspi.kz</p>
+                                <p style={{ fontWeight: 'bold' }}>{t('scan_kaspi_hint')}</p>
                             </div>
                         )}
 
@@ -276,7 +276,7 @@ function EventRegister() {
                             className="btn-primary" 
                             style={{ width: '100%', padding: '18px', fontSize: '18px', marginTop: '30px', justifyContent: 'center' }}
                         >
-                            Оплатить {totalPrice.toLocaleString()} ₸
+                            {t('pay_btn')} {totalPrice.toLocaleString()} ₸
                         </button>
                     </>
                 )}

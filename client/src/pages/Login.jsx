@@ -79,8 +79,8 @@ function Login({ setAuth }) {
             {loading ? <div className="spinner"></div> : t('login')}
           </button>
         </form>
-        <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px' }}>
-          Нет аккаунта? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Зарегистрируйтесь</Link>
+        <p style={{ marginTop: '25px', color: 'var(--text-muted)' }}>
+          {t('no_saved').split(' ')[0]} {t('page_not_found').split(' ')[0]}? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: 'bold', textDecoration: 'none' }}>{t('register')}</Link>
         </p>
       </div>
     </div>

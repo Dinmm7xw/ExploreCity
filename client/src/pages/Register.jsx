@@ -17,7 +17,7 @@ function Register({ setAuth }) {
     setError('');
     
     if (!name || !email || !password) {
-      setError('Заполните все поля');
+      setError(t('fill_required'));
       return;
     }
 
@@ -57,7 +57,7 @@ function Register({ setAuth }) {
             <input 
               type="text" 
               className="input-field" 
-              placeholder="Ваше Имя (ФИО)" 
+              placeholder={t('user_name')} 
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -66,7 +66,7 @@ function Register({ setAuth }) {
             <input 
               type="email" 
               className="input-field" 
-              placeholder="Email" 
+              placeholder={t('email_label')} 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -75,7 +75,7 @@ function Register({ setAuth }) {
             <input 
               type="password" 
               className="input-field" 
-              placeholder="Пароль" 
+              placeholder={t('new_password_label')} 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -85,7 +85,7 @@ function Register({ setAuth }) {
           </button>
         </form>
         <p style={{textAlign: 'center', marginTop: '20px', fontSize: '14px'}}>
-          Уже есть аккаунт? <Link to="/login" style={{color: 'var(--primary)', fontWeight: 'bold'}}>Войдите</Link>
+          {t('reset_pass_success').split(' ')[2]}? <Link to="/login" style={{color: 'var(--primary)', fontWeight: 'bold'}}>{t('login')}</Link>
         </p>
       </div>
     </div>

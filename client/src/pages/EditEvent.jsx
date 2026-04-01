@@ -184,7 +184,7 @@ function EditEvent() {
 
           <div>
              <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('location_label')}</label>
-             <input type="text" list="popular-locations" name="location" className="input-field" value={formData.location || ''} onChange={handleChange} placeholder="Впишите точный адрес или выберите из списка..." />
+             <input type="text" list="popular-locations" name="location" className="input-field" value={formData.location || ''} onChange={handleChange} placeholder={t('location_placeholder')} />
              <datalist id="popular-locations">
                 {Object.keys(LOCATION_COORDS)
                   .filter(loc => !formData.city || LOCATION_COORDS[loc].city === formData.city)
@@ -228,49 +228,49 @@ function EditEvent() {
           </div>
 
           <div>
-            <label style={{display:'block', marginBottom:'4px', fontWeight:'600'}}>Координаты <span style={{fontSize:'12px', color:'#888', fontWeight:'normal'}}>(Широта, Долгота из Google/Yandex Карт)</span></label>
+            <label style={{display:'block', marginBottom:'4px', fontWeight:'600'}}>{t('coordinates_label')} <span style={{fontSize:'12px', color:'#888', fontWeight:'normal'}}>{t('coordinates_hint')}</span></label>
             <input type="text" name="coordinatesStr" className="input-field" value={formData.coordinatesStr || ''} onChange={handleChange} placeholder="Например: 53.2846, 69.3882" />
           </div>
 
           {/* SESSIONS BLOCK */}
           <div style={{ marginTop: '10px', padding: '20px', background: 'rgba(0,0,0,0.02)', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px' }}>Расписание сеансов (Опционально)</h3>
-              <button type="button" onClick={handleAddSession} style={{ padding: '6px 16px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}>+ Добавить сеанс</button>
+              <h3 style={{ margin: 0, fontSize: '18px' }}>{t('sessions_schedule')} {t('optional_label')}</h3>
+              <button type="button" onClick={handleAddSession} style={{ padding: '6px 16px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}>{t('add_session')}</button>
             </div>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '-8px', marginBottom: '20px' }}>Используйте для кинофильмов или туров с несколькими датами/кинотеатрами.</p>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '-8px', marginBottom: '20px' }}>{t('sessions_desc')}</p>
 
             {formData.sessions && formData.sessions.map((session, idx) => (
               <div key={idx} style={{ padding: '16px', background: 'var(--card-bg)', borderRadius: '14px', border: '1px solid var(--border-color)', marginBottom: '15px', position: 'relative', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
                 <button type="button" onClick={() => handleRemoveSession(idx)} style={{ position: 'absolute', top: '10px', right: '10px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>&times;</button>
-                <div style={{ fontWeight: 'bold', marginBottom: '15px', color: 'var(--primary)' }}>Сеанс #{idx + 1}</div>
+                <div style={{ fontWeight: 'bold', marginBottom: '15px', color: 'var(--primary)' }}>{t('session_number')} #{idx + 1}</div>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '12px' }}>
                   <div>
-                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Дата</label>
+                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>{t('date_label')}</label>
                     <input type="date" className="input-field" value={session.date || ''} onChange={(e) => handleSessionChange(idx, 'date', e.target.value)} style={{ padding: '10px' }} />
                   </div>
                   <div>
-                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Время</label>
+                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>{t('time_label')}</label>
                     <input type="time" className="input-field" value={session.time || ''} onChange={(e) => handleSessionChange(idx, 'time', e.target.value)} style={{ padding: '10px' }} />
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '15px', marginBottom: '12px' }}>
                   <div>
-                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Город</label>
+                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>{t('city_label')}</label>
                     <select className="input-field" value={session.city || ''} onChange={(e) => handleSessionChange(idx, 'city', e.target.value)} style={{ padding: '10px' }}>
                        {["Astana", "Almaty", "Shymkent", "Karaganda", "Aktobe", "Taraz", "Pavlodar", "Oskemen", "Semey", "Atyrau", "Kyzylorda", "Kostanay", "Oral", "Petropavl", "Aktau", "Turkistan", "Kokshetau", "Taldykorgan", "Zhezkazgan"].sort().map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Место / Кинотеатр</label>
+                    <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>{t('location_label')}</label>
                     <input type="text" list="popular-locations" className="input-field" value={session.location || ''} onChange={(e) => handleSessionChange(idx, 'location', e.target.value)} placeholder="Kinopark 11 IMAX..." style={{ padding: '10px' }} />
                   </div>
                 </div>
 
                 <div>
-                  <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>Координаты (Широта, Долгота)</label>
+                  <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>{t('coordinates_label')} ({t('coordinates_hint').split(' ')[0]})</label>
                   <input type="text" className="input-field" value={session.coordinatesStr || ''} onChange={(e) => handleSessionChange(idx, 'coordinatesStr', e.target.value)} placeholder="51.123, 71.456" style={{ padding: '10px' }} />
                 </div>
               </div>

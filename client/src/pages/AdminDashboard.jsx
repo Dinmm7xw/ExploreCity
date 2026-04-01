@@ -13,7 +13,7 @@ function AdminDashboard() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user.role !== 'admin') {
-      alert(t('ai_error') || 'Нет доступа!'); 
+      alert(t('ai_error') || 'Access Denied!'); 
       navigate('/');
       return;
     }
@@ -73,7 +73,7 @@ function AdminDashboard() {
       });
       if (res.ok) {
         fetchRefundRequests();
-        alert(action === 'approve' ? 'Возврат одобрен' : 'Возврат отклонен');
+        alert(action === 'approve' ? t('payment_success') : t('reject_btn'));
       }
     } catch (err) {
       console.error(err);
@@ -90,15 +90,15 @@ function AdminDashboard() {
       </div>
       
       <div className="glass-card" style={{ padding: '30px' }}>
-        <h3>Управление мероприятиями ({events.length})</h3>
+        <h3>{t('manage_events')} ({events.length})</h3>
         <div style={{ marginTop: '20px', overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid rgba(0,0,0,0.1)' }}>
-                <th style={{ padding: '12px' }}>ID</th>
-                <th style={{ padding: '12px' }}>Название</th>
-                <th style={{ padding: '12px' }}>Город</th>
-                <th style={{ padding: '12px' }}>Действия</th>
+                <th style={{ padding: '12px' }}>{t('id_label')}</th>
+                <th style={{ padding: '12px' }}>{t('title_label').replace('*', '')}</th>
+                <th style={{ padding: '12px' }}>{t('city_label').replace('*', '')}</th>
+                <th style={{ padding: '12px' }}>{t('actions_label')}</th>
               </tr>
             </thead>
             <tbody>
@@ -121,19 +121,19 @@ function AdminDashboard() {
 
       <div className="glass-card" style={{ padding: '30px', marginTop: '40px' }}>
         <h3 style={{ color: '#e74c3c' }}>
-          <i className="fas fa-hand-holding-usd"></i> Запросы на возврат ({refundRequests.length})
+          <i className="fas fa-hand-holding-usd"></i> {t('refund_requests')} ({refundRequests.length})
         </h3>
         <div style={{ marginTop: '20px', overflowX: 'auto' }}>
           {refundRequests.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)' }}>Нет активных запросов на возврат</p>
+            <p style={{ color: 'var(--text-muted)' }}>{t('no_refund_requests')}</p>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid rgba(0,0,0,0.1)' }}>
-                  <th style={{ padding: '12px' }}>Билет #</th>
-                  <th style={{ padding: '12px' }}>Пользователь</th>
-                  <th style={{ padding: '12px' }}>Мероприятие</th>
-                  <th style={{ padding: '12px' }}>Действия</th>
+                  <th style={{ padding: '12px' }}>{t('electronic_ticket').split(' ')[0]} #</th>
+                  <th style={{ padding: '12px' }}>{t('user_name')}</th>
+                  <th style={{ padding: '12px' }}>{t('event_title')}</th>
+                  <th style={{ padding: '12px' }}>{t('actions_label')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -152,12 +152,12 @@ function AdminDashboard() {
                       <button 
                         onClick={() => handleRefundAction(req.ticket_id, 'approve')} 
                         style={{ marginRight: '8px', padding: '6px 12px', background: '#27ae60', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                        Одобрить
+                        {t('approve_btn')}
                       </button>
                       <button 
                         onClick={() => handleRefundAction(req.ticket_id, 'reject')} 
                         style={{ padding: '6px 12px', background: 'none', color: '#e74c3c', border: '1px solid #e74c3c', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                        Отклонить
+                        {t('reject_btn')}
                       </button>
                     </td>
                   </tr>

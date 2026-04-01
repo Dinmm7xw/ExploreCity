@@ -1,21 +1,7 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API_URL } from '../config';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-
-// Fix Leaflet icons
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
 
 function EventDetails({ isAuthenticated }) {
   const { t } = useTranslation();
@@ -27,7 +13,6 @@ function EventDetails({ isAuthenticated }) {
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
   const [selectedSession, setSelectedSession] = useState(null);
 
   const fetchEvent = useCallback(async () => {
@@ -90,15 +75,23 @@ function EventDetails({ isAuthenticated }) {
           longitude: evt.longitude
         };
         const isDuplicate = evt.sessions.some(s => s.city === evt.city && s.location === evt.location && s.date === evt.date);
-        
         let newSessions = [...evt.sessions];
         if (!isDuplicate) {
           newSessions = [masterAsSession, ...newSessions];
         }
-        
         evt.sessions = newSessions;
         setEvent({...evt});
         setSelectedSession(newSessions[0]);
+      } else if (evt) {
+        setSelectedSession({
+            id: 'master',
+            city: evt.city,
+            location: evt.location,
+            date: evt.date,
+            time: evt.time || '',
+            latitude: evt.latitude,
+            longitude: evt.longitude
+        });
       }
       await fetchReviews();
       if (evt) await fetchWeather(evt);
@@ -106,9 +99,6 @@ function EventDetails({ isAuthenticated }) {
     };
     loadAll();
   }, [id, fetchEvent, fetchReviews, fetchWeather]);
-
-  // Карты на странице детализации теперь используют Yandex Maps iframe
-
 
   const handleDelete = async () => {
     if (!window.confirm(t('delete_confirm'))) return;
@@ -120,7 +110,7 @@ function EventDetails({ isAuthenticated }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-      alert(t('success_deleted') || 'Успешно удалено!');
+      alert(t('success_deleted'));
       navigate('/events');
     } catch (err) {
       alert(err.message);
@@ -151,11 +141,11 @@ function EventDetails({ isAuthenticated }) {
   };
 
   if (loading) return <div className="container" style={{padding:'100px', textAlign:'center'}}><div className="spinner"></div></div>;
-  if (error) return <div className="container" style={{padding:'100px', textAlign:'center'}}><div className="glass-card" style={{padding:'40px'}}><h2 style={{color:'red'}}>{error}</h2><button className="btn-primary" style={{marginTop:'20px'}} onClick={() => navigate('/events')}>{t('back_to_events')}</button></div></div>;
-  if (!event) return <div className="container" style={{padding:'100px', textAlign:'center'}}><h2>{t('event_not_found')}</h2></div>;
+  if (error) return <div className="container" style={{padding:'100px', textAlign:'center'}}><div className="glass-card" style={{padding:'40px'}}><h2 style={{color:'red'}}>{error}</h2><button className="btn-primary" style={{marginTop:'20px'}} onClick={() => navigate('/events')}>{t('back_to_home')}</button></div></div>;
+  if (!event) return <div className="container" style={{padding:'100px', textAlign:'center'}}><h2>{t('no_events_found')}</h2></div>;
 
-  const role = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).role : null;
-  const canModify = role === 'admin';
+  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+  const canModify = user && user.role === 'admin';
 
   return (
     <div className="container" style={{ padding: '40px 20px' }}>
@@ -194,22 +184,33 @@ function EventDetails({ isAuthenticated }) {
         </div>
         
         <div className="mobile-p-20" style={{ padding: '40px' }}>
-          <h1 style={{ fontSize: '36px', marginBottom: '16px', color: 'var(--text-main)' }}>{event.title}</h1>
-          <div className="stack-mobile" style={{ display: 'flex', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
-            <span style={{background: 'rgba(193, 123, 76, 0.1)', padding: '8px 16px', borderRadius: '20px', color: 'var(--primary)', fontWeight: 'bold'}}><i className="fas fa-tag"></i> {event.category}</span>
-            <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="fas fa-location-dot" style={{color: 'var(--primary)'}}></i> {selectedSession ? `${selectedSession.city}, ${selectedSession.location}` : `${event.city}, ${event.location}`}</span>
-            <span style={{background: 'rgba(0,0,0,0.05)', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold'}}><i className="far fa-calendar-alt" style={{color: 'var(--primary)'}}></i> {selectedSession ? `${selectedSession.date} ${selectedSession.time ? `в ${selectedSession.time}` : ''}` : `${event.date} ${event.time ? `в ${event.time}` : ''}`}</span>
-            <span style={{background: '#ffd966', padding: '8px 16px', borderRadius: '20px', color: '#000', fontWeight: 'bold'}}><i className="fas fa-star"></i> {event.rating}</span>
-            {weather && (
-              <span style={{background: 'rgba(52, 152, 219, 0.1)', padding: '8px 16px', borderRadius: '20px', color: '#2980b9', fontWeight: 'bold'}}>
-                <i className={weather.code <= 3 ? "fas fa-sun" : "fas fa-cloud"}></i> {weather.temp}°C
-              </span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ flex: 1 }}>
+              <h1 style={{ fontSize: '36px', marginBottom: '16px', color: 'var(--text-main)' }}>{event.title}</h1>
+              <div className="stack-mobile" style={{ display: 'flex', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                <span style={{background: 'rgba(193, 123, 76, 0.1)', padding: '8px 16px', borderRadius: '20px', color: 'var(--primary)', fontWeight: 'bold'}}><i className="fas fa-tag"></i> {event.category}</span>
+                <span style={{background: '#ffd966', padding: '8px 16px', borderRadius: '20px', color: '#000', fontWeight: 'bold'}}><i className="fas fa-star"></i> {event.rating}</span>
+                {weather && (
+                  <span style={{background: 'rgba(52, 152, 219, 0.1)', padding: '8px 16px', borderRadius: '20px', color: '#2980b9', fontWeight: 'bold'}}>
+                    <i className={weather.code <= 3 ? "fas fa-sun" : "fas fa-cloud"}></i> {weather.temp}°C
+                  </span>
+                )}
+              </div>
+            </div>
+            {isAuthenticated && (
+              <button 
+                className="btn-primary" 
+                style={{ background: '#2ecc71', color: 'white', padding: '15px 30px' }} 
+                onClick={() => navigate(selectedSession && selectedSession.id !== 'master' ? `/event/${id}/register?session=${selectedSession.id}` : `/event/${id}/register`)}
+              >
+                <i className="fas fa-ticket-alt"></i> {t('book_ticket')}
+              </button>
             )}
           </div>
 
           {event.sessions && event.sessions.length > 0 && (
             <div style={{ marginBottom: '30px', background: 'rgba(0,0,0,0.02)', padding: '24px', borderRadius: '16px', border: '1px solid #eee' }}>
-              <h3 style={{ fontSize: '18px', marginBottom: '16px' }}><i className="far fa-clock" style={{color: 'var(--primary)'}}></i> Выберите расписание и место</h3>
+              <h3 style={{ fontSize: '18px', marginBottom: '16px' }}><i className="far fa-clock" style={{color: 'var(--primary)'}}></i> {t('select_sector_seat')}</h3>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 {event.sessions.map(s => (
                   <button 
@@ -234,11 +235,14 @@ function EventDetails({ isAuthenticated }) {
             </div>
           )}
 
-          <div style={{ fontSize: '18px', color: 'var(--text-muted)', lineHeight: '1.8', marginBottom: '40px' }}>
-            {event.description}
+          <div style={{ marginTop: '30px', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '30px' }}>
+            <h3 style={{ fontSize: '24px', marginBottom: '15px' }}>{t('description_label')}</h3>
+            <div style={{ fontSize: '18px', color: 'var(--text-muted)', lineHeight: '1.8', marginBottom: '40px' }}>
+                {event.description || t('no_description')}
+            </div>
           </div>
 
-          <div style={{ marginBottom: '40px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+          <div style={{ marginBottom: '40px', borderRadius: '16px', overflow: 'hidden' }}>
             <h3 style={{ marginBottom: '16px', fontSize: '20px' }}><i className="fas fa-map-marked-alt" style={{color: 'var(--primary)'}}></i> {t('location_on_map')}</h3>
             {(() => {
               const activeLat = selectedSession ? selectedSession.latitude : event.latitude;
@@ -250,35 +254,28 @@ function EventDetails({ isAuthenticated }) {
                 <iframe 
                   key={`${activeLat}-${activeLng}`}
                   src={`https://yandex.ru/map-widget/v1/?ll=${activeLng},${activeLat}&z=16&pt=${activeLng},${activeLat},pm2rdm`} 
-                  width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px' }}>
+                  width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px', border: '1px solid #eee' }}>
                 </iframe>
               ) : (
                 <iframe 
                   key={`${activeCity}-${activeLoc}`}
                   src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(activeCity + ', ' + activeLoc)}&z=16`} 
-                  width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px' }}>
+                  width="100%" height="350" frameBorder="0" style={{ borderRadius: '12px', border: '1px solid #eee' }}>
                 </iframe>
               );
             })()}
           </div>
 
-          <div className="stack-mobile" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-            {isAuthenticated && (
-              <button className="btn-primary" style={{ background: '#2ecc71', color: 'white' }} onClick={() => navigate(selectedSession && selectedSession.id !== 'master' ? `/event/${id}/register?session=${selectedSession.id}` : `/event/${id}/register`)}>
-                <i className="fas fa-ticket-alt"></i> {t('book_ticket')}
+          {canModify && (
+            <div className="stack-mobile" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', borderTop: '1px solid #eee', paddingTop: '30px' }}>
+              <button className="btn-primary" style={{ background: '#f39c12', display: 'flex', justifyContent: 'center' }} onClick={() => navigate(`/edit-event/${id}`)}>
+                <i className="fas fa-edit"></i> {t('edit_btn')}
               </button>
-            )}
-            {canModify && (
-              <>
-                <button className="btn-primary" style={{ background: '#f39c12', display: 'flex', justifyContent: 'center' }} onClick={() => navigate(`/edit-event/${id}`)}>
-                  <i className="fas fa-edit"></i> {t('edit_btn')}
-                </button>
-                <button className="btn-primary" style={{ background: '#e74c3c', display: 'flex', justifyContent: 'center' }} onClick={handleDelete}>
-                  <i className="fas fa-trash"></i> {t('delete_btn')}
-                </button>
-              </>
-            )}
-          </div>
+              <button className="btn-primary" style={{ background: '#e74c3c', display: 'flex', justifyContent: 'center' }} onClick={handleDelete}>
+                <i className="fas fa-trash"></i> {t('delete_btn')}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -299,16 +296,20 @@ function EventDetails({ isAuthenticated }) {
           </form>
         )}
         <div style={{ display: 'grid', gap: '20px' }}>
-          {reviews.map(rev => (
-            <div key={rev.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '15px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontWeight: 'bold' }}>{rev.user_name}</span>
-                <div style={{ color: '#f1c40f' }}>{[...Array(5)].map((_, i) => (<i key={i} className={i < rev.rating ? "fas fa-star" : "far fa-star"}></i>))}</div>
+          {reviews.length === 0 ? (
+            <p style={{ color: 'var(--text-muted)' }}>{t('no_reviews')}</p>
+          ) : (
+            reviews.map(rev => (
+              <div key={rev.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '15px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontWeight: 'bold' }}>{rev.user_name}</span>
+                  <div style={{ color: '#f1c40f' }}>{[...Array(5)].map((_, i) => (<i key={i} className={i < rev.rating ? "fas fa-star" : "far fa-star"}></i>))}</div>
+                </div>
+                <p style={{ margin: 0, color: 'var(--text-main)', fontSize: '15px' }}>{rev.comment}</p>
+                <div style={{ fontSize: '12px', color: '#999', marginTop: '5px' }}>{new Date(rev.created_at).toLocaleDateString()}</div>
               </div>
-              <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '15px' }}>{rev.comment}</p>
-              <div style={{ fontSize: '12px', color: '#999', marginTop: '5px' }}>{new Date(rev.created_at).toLocaleDateString()}</div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

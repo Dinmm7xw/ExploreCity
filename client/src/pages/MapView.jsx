@@ -65,12 +65,11 @@ function MapView({ embedded = false, activeCity = 'All' }) {
           });
         },
         (error) => {
-          // Если пользователь нажал "Запретить" доступ к геолокации
-          alert('Не удалось получить гео-позицию. Разрешите доступ к локации в настройках браузера.');
+          alert(t('geo_error'));
         }
       );
     } else {
-      alert('Ваш браузер не поддерживает GPS (Гео-позицию)');
+      alert(t('browser_no_gps'));
     }
   };
 
@@ -112,7 +111,7 @@ function MapView({ embedded = false, activeCity = 'All' }) {
       // 1. Рисуем 5-километровый прозрачный зеленый/синий круг вокруг пользователя (радар)
       if (userLatLng) {
         L.circle(userLatLng, { radius: 5000, color: '#3498db', fillOpacity: 0.1, weight: 2 }).addTo(map);
-        L.circleMarker(userLatLng, { radius: 8, color: 'white', fillColor: '#3498db', fillOpacity: 1, weight: 3 }).addTo(map).bindPopup('<b>Вы здесь</b>');
+        L.circleMarker(userLatLng, { radius: 8, color: 'white', fillColor: '#3498db', fillOpacity: 1, weight: 3 }).addTo(map).bindPopup(`<b>${t('you_are_here')}</b>`);
       }
 
       events.forEach(ev => {
@@ -212,9 +211,9 @@ function MapView({ embedded = false, activeCity = 'All' }) {
           }}
         >
           {userLocation ? (
-            <><i className="fas fa-times"></i> Сбросить радар</>
+            <><i className="fas fa-times"></i> {t('reset_radar')}</>
           ) : (
-            <><i className="fas fa-location-crosshairs"></i> {t('near_me') || 'Рядом (5 км)'}</>
+            <><i className="fas fa-location-crosshairs"></i> {t('near_me')}</>
           )}
         </button>
 
@@ -248,14 +247,14 @@ function MapView({ embedded = false, activeCity = 'All' }) {
   return (
     <div className="container" style={{ padding: '40px 20px', minHeight: '80vh' }}>
       <div className="section-title">
-        <h2>{t('map_view_title') || 'Карта мероприятий'}</h2>
+        <h2>{t('map_view_title')}</h2>
         <div className="title-underline"></div>
       </div>
 
       {mapContent}
       
       <div style={{ marginTop: '20px', color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>
-        <i className="fas fa-info-circle"></i> {t('map_hint') || 'Нажмите на маркер, чтобы увидеть детали мероприятия'}
+        <i className="fas fa-info-circle"></i> {t('map_hint')}
       </div>
     </div>
   );

@@ -81,7 +81,7 @@ function Profile() {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Билет ExploreCity #${ticketId}</title>
+          <title>${t('home')} ExploreCity #${ticketId}</title>
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
           <style>
             body { font-family: 'Inter', sans-serif; display: flex; justify-content: center; padding: 50px; background: #f0f2f5; }
@@ -162,7 +162,7 @@ function Profile() {
             boxShadow: '0 10px 30px rgba(0,0,0,0.08)', border: '1px solid rgba(0,0,0,0.05)'
           }}>
             <div style={{ padding: '24px', flex: 1, minWidth: 0, borderRight: '2px dashed #e1e4e8', overflow: 'hidden' }}>
-              <span style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>{t('event_ticket') || 'Билет на мероприятие'}</span>
+              <span style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>{t('event_ticket')}</span>
               <h4 style={{ fontSize: '18px', margin: '4px 0 12px', color: 'var(--text-main)', lineHeight: '1.3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tk.title}</h4>
               <div className="main-info">
                 <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}><i className="far fa-calendar-alt"></i> {tk.session_date || tk.date} в {tk.session_time || tk.time}</p>
@@ -171,7 +171,7 @@ function Profile() {
 
               {tk.seats && (
                 <div className="seats-tag" style={{ marginTop: '12px', fontSize: '13px', color: 'var(--primary)', fontWeight: 'bold', background: 'rgba(193, 123, 76, 0.1)', padding: '4px 10px', borderRadius: '6px', display: 'inline-block' }}>
-                  <i className="fas fa-couch"></i> {t('seats_label') || 'Места'}: {tk.seats}
+                  <i className="fas fa-couch"></i> {t('seats_label')}: {tk.seats}
                 </div>
               )}
               
@@ -192,7 +192,7 @@ function Profile() {
                 <Link 
                   to={`/refund/${tk.ticket_id}`}
                   style={{ textDecoration: 'none', color: '#e74c3c', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px', marginLeft: 'auto' }}>
-                  <i className="fas fa-undo"></i> {t('refund_ticket_btn') || 'Вернуть'}
+                  <i className="fas fa-undo"></i> {t('refund_ticket_btn')}
                 </Link>
               </div>
             </div>
@@ -227,7 +227,7 @@ function Profile() {
             <h1 style={{ fontSize: '32px', marginBottom: '8px', color: 'var(--text-main)' }}>{user.name}</h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '18px' }}>{user.email}</p>
             <span style={{ display: 'inline-block', marginTop: '8px', padding: '4px 12px', background: 'rgba(0,0,0,0.05)', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>
-              {t('role_label') || 'Роль'}: {user.role === 'admin' ? t('role_admin') : t('role_user')}
+              {t('role_label')}: {user.role === 'admin' ? t('role_admin') : t('role_user')}
             </span>
           </div>
         </div>
@@ -241,7 +241,7 @@ function Profile() {
               <h3 style={{ fontSize: '24px', borderBottom: '3px solid var(--primary)', display: 'inline-block', paddingBottom: '8px', marginBottom: '10px' }}>
                 <i className="fas fa-qrcode"></i> {t('my_tickets')}
               </h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>{t('qr_hint') || 'Покажите этот QR-код на входе в мероприятие'}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>{t('qr_hint')}</p>
               <TicketList tickets={myTickets} />
             </div>
 

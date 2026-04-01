@@ -11,15 +11,15 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Проверка, существует ли пользователь
+
     const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (userExists.rows.length > 0) return res.status(400).json({ message: 'Пользователь уже существует' });
 
-    // Хеширование пароля
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Добавление в PostgreSQL БД
+
     const newUser = await pool.query(
       'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email, role',
       [name, email, hashedPassword]
@@ -39,17 +39,17 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Поиск пользователя
+
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     const user = result.rows[0];
 
     if (!user) return res.status(400).json({ message: 'Неверный email или пароль' });
 
-    // Проверка пароля
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Неверный email или пароль' });
 
-    // Генерация токена
+
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET || 'explorecity_super_secret_key_123', { expiresIn: '1d' });
 
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
@@ -59,7 +59,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Эндпоинт для возврата билета
+
 router.post('/tickets/:id/refund', async (req, res) => {
   try {
     const ticketId = req.params.id;
@@ -69,7 +69,7 @@ router.post('/tickets/:id/refund', async (req, res) => {
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'explorecity_super_secret_key_123');
 
-    // Обновляем статус билета в БД
+
     const result = await pool.query(
       'UPDATE event_registrations SET status = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
       ['refunded', ticketId, decoded.id]
@@ -81,11 +81,11 @@ router.post('/tickets/:id/refund', async (req, res) => {
 
     const ticket = result.rows[0];
 
-    // Получаем детали пользователя для Email
+
     const userRes = await pool.query('SELECT email, name FROM users WHERE id = $1', [decoded.id]);
     const user = userRes.rows[0];
 
-    // Отправляем уведомление о возврате
+
     sendMockEmail(
       user.email,
       'Возврат билета в ExploreCity',
@@ -100,19 +100,19 @@ router.post('/tickets/:id/refund', async (req, res) => {
 });
 
 
-// POST /api/auth/forgot-password - Запрос на сброс пароля
+
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
     const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
 
     if (user.rows.length === 0) {
-      // Для безопасности не говорим, что пользователя не существует
+
       return res.json({ message: 'Если этот email зарегистрирован, ссылка придет на него.' });
     }
 
     const token = crypto.randomBytes(32).toString('hex');
-    const expiry = new Date(Date.now() + 3600000); // 1 час
+    const expiry = new Date(Date.now() + 3600000);
 
     await pool.query(
       'UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE email = $3',
@@ -146,7 +146,7 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
-// POST /api/auth/reset-password - Сброс пароля с токеном
+
 router.post('/reset-password', async (req, res) => {
   try {
     const { token, newPassword } = req.body;
