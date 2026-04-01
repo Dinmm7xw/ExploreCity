@@ -22,7 +22,6 @@ function EventRegister() {
   
   // Новые состояния для оплаты
   const [step, setStep] = useState(1); // 1 - Данные, 2 - Оплата
-  const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' или 'qr'
   const [isProcessing, setIsProcessing] = useState(false);
 
   const TICKET_PRICE = 5000; // Условная цена за один билет
@@ -240,36 +239,18 @@ function EventRegister() {
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '10px', marginBottom: '25px' }}>
-                            <button 
-                                onClick={() => setPaymentMethod('card')}
-                                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: `2px solid ${paymentMethod === 'card' ? 'var(--primary)' : '#eee'}`, background: paymentMethod === 'card' ? 'rgba(193,123,76,0.05)' : 'white', cursor: 'pointer', fontWeight: 'bold' }}
-                            >
-                                <i className="fas fa-credit-card"></i> {t('card')}
-                            </button>
-                            <button 
-                                onClick={() => setPaymentMethod('qr')}
-                                style={{ flex: 1, padding: '12px', borderRadius: '12px', border: `2px solid ${paymentMethod === 'qr' ? 'var(--primary)' : '#eee'}`, background: paymentMethod === 'qr' ? 'rgba(193,123,76,0.05)' : 'white', cursor: 'pointer', fontWeight: 'bold' }}
-                            >
-                                <i className="fas fa-qrcode"></i> {t('kaspi_qr')}
-                            </button>
+                        <div style={{ marginBottom: '25px', padding: '12px', borderRadius: '12px', border: '2px solid var(--primary)', background: 'rgba(193,123,76,0.05)', textAlign: 'center', fontWeight: 'bold' }}>
+                            <i className="fas fa-credit-card"></i> {t('card')}
                         </div>
 
-                        {paymentMethod === 'card' ? (
-                            <div style={{ display: 'grid', gap: '15px' }}>
-                                <input type="text" className="input-field" placeholder="0000 0000 0000 0000" />
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                    <input type="text" className="input-field" placeholder="ММ / ГГ" />
-                                    <input type="text" className="input-field" placeholder="CVC" />
-                                </div>
-                                <p style={{ fontSize: '11px', color: '#999', textAlign: 'center' }}>{t('ssl_hint')}</p>
+                        <div style={{ display: 'grid', gap: '15px' }}>
+                            <input type="text" className="input-field" placeholder="0000 0000 0000 0000" />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <input type="text" className="input-field" placeholder="ММ / ГГ" />
+                                <input type="text" className="input-field" placeholder="CVC" />
                             </div>
-                        ) : (
-                            <div style={{ textAlign: 'center', padding: '20px', background: 'white', borderRadius: '12px', border: '1px solid #eee' }}>
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=KaspiPay" alt="Kaspi QR" style={{ width: '150px', marginBottom: '15px' }} />
-                                <p style={{ fontWeight: 'bold' }}>{t('scan_kaspi_hint')}</p>
-                            </div>
-                        )}
+                            <p style={{ fontSize: '11px', color: '#999', textAlign: 'center' }}>{t('ssl_hint')}</p>
+                        </div>
 
                         <button 
                             onClick={handleSubmit} 

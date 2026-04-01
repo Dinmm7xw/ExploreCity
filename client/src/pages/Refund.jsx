@@ -29,7 +29,7 @@ function Refund() {
       
       if (!res.ok) throw new Error('Failed to process refund');
       
-      alert(t('refund_success') || 'Запрос на возврат успешно отправлен! Средства вернутся в течение 3-5 дней.');
+      alert(t('refund_request_sent'));
       navigate('/profile');
     } catch (err) {
       alert(err.message);
@@ -44,11 +44,11 @@ function Refund() {
         <div style={{ fontSize: '60px', color: 'var(--primary)', marginBottom: '20px' }}>
           <i className="fas fa-undo-alt"></i>
         </div>
-        <h2 style={{ fontSize: '28px', marginBottom: '20px' }}>{t('refund_title') || 'Возврат билета'}</h2>
+        <h2 style={{ fontSize: '28px', marginBottom: '20px' }}>{t('refund_title')}</h2>
         <p style={{ color: 'var(--text-muted)', marginBottom: '30px', lineHeight: '1.6' }}>
-          {t('refund_confirm_text') || `Вы уверены, что хотите вернуть билет №${ticketId}?`}
+          {t('refund_confirm_text', { id: ticketId })}
           <br />
-          {t('refund_warning') || 'Это действие нельзя будет отменить.'}
+          {t('refund_warning')}
         </p>
 
         <div style={{ display: 'flex', gap: '15px' }}>
@@ -58,14 +58,14 @@ function Refund() {
                 className="btn-primary" 
                 style={{ flex: 1, background: '#e74c3c' }}
             >
-                {loading ? <i className="fas fa-spinner fa-spin"></i> : (t('confirm_refund_btn') || 'Да, вернуть билет')}
+                {loading ? <i className="fas fa-spinner fa-spin"></i> : t('confirm_refund_btn')}
             </button>
             <button 
                 onClick={() => navigate(-1)} 
                 className="btn-primary" 
                 style={{ flex: 1, background: '#95a5a6' }}
             >
-                {t('cancel_btn') || 'Отмена'}
+                {t('cancel_btn')}
             </button>
         </div>
       </div>

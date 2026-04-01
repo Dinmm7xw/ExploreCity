@@ -30,15 +30,15 @@ function NotFound() {
       padding: '20px'
     }}>
       <h1 style={{ fontSize: '120px', margin: '0', color: 'var(--primary)', fontWeight: '800' }}>404</h1>
-      <h2 style={{ fontSize: '32px', marginBottom: '20px' }}>{t('page_not_found') || 'Упс! Страница не найдена'}</h2>
+      <h2 style={{ fontSize: '32px', marginBottom: '20px' }}>{t('page_not_found')}</h2>
       <p style={{ color: 'var(--text-muted)', maxWidth: '500px', marginBottom: '10px', fontSize: '18px' }}>
-        {t('not_found_desc') || 'Похоже, вы зашли не туда. Но не волнуйтесь, все дороги ведут в ExploreCity!'}
+        {t('not_found_desc')}
       </p>
       <p style={{ color: 'var(--text-color)', fontWeight: 'bold', marginBottom: '40px', fontSize: '16px' }}>
-        Перенаправление на главную через {countdown} сек...
+        {t('redirect_hint', { count: countdown })}
       </p>
       <Link to="/" className="btn-primary" style={{ padding: '15px 40px', fontSize: '18px', textDecoration: 'none' }}>
-        <i className="fas fa-home"></i> {t('back_to_home') || 'Перейти сейчас'}
+        <i className="fas fa-home"></i> {t('back_to_home')}
       </Link>
     </div>
   );
