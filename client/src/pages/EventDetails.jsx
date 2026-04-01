@@ -19,7 +19,7 @@ function EventDetails({ isAuthenticated }) {
     try {
       const res = await fetch(`${API_URL}/api/events/${id}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Ошибка загрузки');
+      if (!res.ok) throw new Error(data.message || t('loading_error_msg'));
       setEvent(data);
       return data;
     } catch (err) {
@@ -129,11 +129,14 @@ function EventDetails({ isAuthenticated }) {
         },
         body: JSON.stringify(newReview)
       });
+      const data = await res.json();
       if (res.ok) {
+        alert(t(data.message) || data.message);
         setNewReview({ rating: 5, comment: '' });
         fetchReviews();
-        const data = await res.json();
         setEvent({ ...event, rating: data.newRating });
+      } else {
+        alert(t(data.message) || data.message);
       }
     } catch (err) {
       console.error(err);

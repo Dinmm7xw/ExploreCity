@@ -100,10 +100,10 @@ function Profile() {
         <body>
           <div class="ticket-print">
             <div class="info">
-              <span class="badge">${t('electronic_ticket') || 'ЭЛЕКТРОННЫЙ БИЛЕТ'}</span>
+              <span class="badge">${t('electronic_ticket')}</span>
               <h1 style="font-size: 22px; margin: 15px 0;">${ticketElement.querySelector('h4').innerText}</h1>
               ${ticketElement.querySelector('.main-info').innerHTML}
-              ${ticketElement.querySelector('.seats-tag') ? `<div class="seats-info">${t('seats_label') || 'МЕСТА'}: ${ticketElement.querySelector('.seats-tag').innerText}</div>` : ''}
+              ${ticketElement.querySelector('.seats-tag') ? `<div class="seats-info">${t('seats_label')}: ${ticketElement.querySelector('.seats-tag').innerText}</div>` : ''}
             </div>
             <div class="qr">
               ${ticketElement.querySelector('.qr-code-box').innerHTML}
@@ -165,7 +165,7 @@ function Profile() {
               <span style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>{t('event_ticket')}</span>
               <h4 style={{ fontSize: '18px', margin: '4px 0 12px', color: 'var(--text-main)', lineHeight: '1.3', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tk.title}</h4>
               <div className="main-info">
-                <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}><i className="far fa-calendar-alt"></i> {tk.session_date || tk.date} в {tk.session_time || tk.time}</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}><i className="far fa-calendar-alt"></i> {tk.session_date || tk.date} {t('at_time')} {tk.session_time || tk.time}</p>
                 <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><i className="fas fa-map-marker-alt"></i> {tk.session_location || tk.location}, {tk.session_city || tk.city}</p>
               </div>
 
@@ -218,7 +218,7 @@ function Profile() {
     <div className="container" style={{ padding: '60px 20px', minHeight: '70vh' }}>
       <div className="glass-card" style={{ padding: '50px', maxWidth: '1000px', margin: '0 auto' }}>
         
-        {/* Шапка профиля */}
+        {/* Profile Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '30px', marginBottom: '40px', borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '30px' }}>
           <div style={{ width: '100px', height: '100px', background: 'var(--primary)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', fontWeight: 'bold' }}>
             {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
@@ -253,7 +253,7 @@ function Profile() {
               <EventList events={savedEvents} emptyMsg={t('no_saved')} />
             </div>
 
-            {/* Блок: Мои события */}
+            {/* Block: My Events */}
             <div>
               <h3 style={{ fontSize: '22px', borderBottom: '2px solid rgba(0,0,0,0.1)', display: 'inline-block', paddingBottom: '8px' }}>
                 <i className="fas fa-calendar-plus"></i> {t('my_organized_events')}

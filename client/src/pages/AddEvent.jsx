@@ -106,7 +106,7 @@ function AddEvent() {
     
     // Client-side validation
     if (!formData.title || !formData.category || !formData.city || !formData.location) {
-      setError(t('fill_required') || 'Заполните все обязательные поля (*)');
+      setError(t('fill_required'));
       return;
     }
 
@@ -124,10 +124,12 @@ function AddEvent() {
       
       const data = await res.json();
       
-      if (!res.ok) throw new Error(data.message);
-      
-      alert(t('success_saved'));
-      navigate(`/event/${data.id}`);
+      if (res.ok) {
+        alert(t('Мероприятие создано'));
+        navigate('/admin');
+      } else {
+        setError(t(data.message) || data.message);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -151,7 +153,7 @@ function AddEvent() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div>
               <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('category_label')}</label>
-              <input type="text" name="category" className="input-field" placeholder={t('category_placeholder') || "Например: Выставка, Концерт"} value={formData.category} onChange={handleChange} />
+              <input type="text" name="category" className="input-field" placeholder={t('category_placeholder')} value={formData.category} onChange={handleChange} />
             </div>
             <div>
               <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('city_label')}</label>
@@ -184,8 +186,8 @@ function AddEvent() {
           </div>
 
           <div>
-             <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('image_url_label') || 'URL изображения / YouTube видео'}</label>
-             <input type="text" name="image_url" className="input-field" value={formData.image_url} onChange={handleChange} placeholder={t('image_url_placeholder') || "Вставьте ссылку на картинку или YouTube видео..."} />
+             <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('image_url_label')}</label>
+             <input type="text" name="image_url" className="input-field" value={formData.image_url || ''} onChange={handleChange} placeholder={t('image_url_placeholder')} />
              
              {/* Живое превью новой картинки */}
              {formData.image_url && (
@@ -195,11 +197,11 @@ function AddEvent() {
                         if (!formData.image_url) return '';
                         if (formData.image_url.includes('youtube.com') || formData.image_url.includes('youtu.be')) {
                           const vidId = formData.image_url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|u\/\w\/|embed\/|watch\?v=))([^#&?]*)/)?.[1];
-                          return vidId ? `https://img.youtube.com/vi/${vidId}/0.jpg` : formData.image_url;
+                          return vidId ? `https://img.youtube.com/vi/${vidId}/maxresdefault.jpg` : '';
                         }
                         return formData.image_url;
                       })()} 
-                      alt="Превью" 
+                      alt="Preview" 
                       style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block' }} 
                     />
                 </div>
@@ -208,7 +210,7 @@ function AddEvent() {
 
           <div>
             <label style={{display:'block', marginBottom:'4px', fontWeight:'600'}}>{t('coordinates_label')} <span style={{fontSize:'12px', color:'#888', fontWeight:'normal'}}>{t('coordinates_hint')}</span></label>
-            <input type="text" name="coordinatesStr" className="input-field" value={formData.coordinatesStr} onChange={handleChange} placeholder="Например: 53.2846, 69.3882" />
+            <input type="text" name="coordinatesStr" className="input-field" value={formData.coordinatesStr} onChange={handleChange} placeholder={t('coordinates_example')} />
           </div>
 
           {/* SESSIONS BLOCK */}
@@ -244,12 +246,12 @@ function AddEvent() {
                   </div>
                   <div>
                     <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>{t('location_label')}</label>
-                    <input type="text" list="popular-locations" className="input-field" value={session.location} onChange={(e) => handleSessionChange(idx, 'location', e.target.value)} placeholder="Kinopark 11 IMAX..." style={{ padding: '10px' }} />
+                    <input type="text" list="popular-locations" className="input-field" value={session.location} onChange={(e) => handleSessionChange(idx, 'location', e.target.value)} placeholder={t('location_example')} style={{ padding: '10px' }} />
                   </div>
                 </div>
 
                 <div>
-                  <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>{t('coordinates_label')} ({t('coordinates_hint').split(' ')[0]})</label>
+                  <label style={{display:'block', fontSize:'13px', marginBottom:'4px', fontWeight: 'bold'}}>{t('coordinates_label')} ({t('coordinates_short')})</label>
                   <input type="text" className="input-field" value={session.coordinatesStr || ''} onChange={(e) => handleSessionChange(idx, 'coordinatesStr', e.target.value)} placeholder="51.123, 71.456" style={{ padding: '10px' }} />
                 </div>
               </div>

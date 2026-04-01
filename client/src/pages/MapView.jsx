@@ -157,7 +157,7 @@ function MapView({ embedded = false, activeCity = 'All' }) {
               <div style="min-width: 150px">
                 <img src="${bannerUrl}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />
                 <h4 style="margin: 0 0 5px; font-size: 14px;">${loc.title}</h4>
-                <p style="margin: 0 0 10px; font-size: 12px; color: #666;">${loc.date || ''} | ${loc.city}</p>
+                <p style="margin: 0 0 10px; font-size: 12px; color: #666;">${loc.date || ''} | ${t(loc.city)}</p>
                 <a href="/event/${ev.id}" style="display: block; padding: 6px 0; text-align: center; background: #c17b4c; color: white; border-radius: 5px; text-decoration: none; font-size: 12px; font-weight: bold;">
                   ${t('view_btn')}
                 </a>
@@ -232,12 +232,12 @@ function MapView({ embedded = false, activeCity = 'All' }) {
       <div style={{ padding: '60px 0', background: 'rgba(0,0,0,0.02)' }}>
         <div className="container">
           <div className="section-title">
-            <h2>{t('event_map') || 'Все мероприятия на карте'}</h2>
+            <h2>{t('event_map')}</h2>
             <div className="title-underline"></div>
           </div>
           {mapContent}
           <div style={{ marginTop: '20px', color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>
-            <i className="fas fa-info-circle"></i> {t('map_hint') || 'Нажмите на маркер, чтобы увидеть детали мероприятия'}
+            <i className="fas fa-info-circle"></i> {t('map_hint')}
           </div>
         </div>
       </div>

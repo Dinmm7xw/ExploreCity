@@ -13,7 +13,7 @@ function AdminDashboard() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user.role !== 'admin') {
-      alert(t('ai_error') || 'Access Denied!'); 
+      alert(t('access_denied')); 
       navigate('/');
       return;
     }
@@ -71,9 +71,10 @@ function AdminDashboard() {
         },
         body: JSON.stringify({ action })
       });
+      const data = await res.json();
       if (res.ok) {
         fetchRefundRequests();
-        alert(action === 'approve' ? t('payment_success') : t('reject_btn'));
+        alert(t(data.message) || data.message);
       }
     } catch (err) {
       console.error(err);
@@ -85,7 +86,7 @@ function AdminDashboard() {
   return (
     <div className="container" style={{ padding: '40px 20px', minHeight: '80vh' }}>
       <div className="section-title">
-        <h2>{t('role_admin')} Board</h2>
+        <h2>{t('admin_board')}</h2>
         <div className="title-underline"></div>
       </div>
       
@@ -108,7 +109,7 @@ function AdminDashboard() {
                   <td style={{ padding: '12px', fontWeight: 'bold' }}>{ev.title}</td>
                   <td style={{ padding: '12px' }}>{ev.city}</td>
                   <td style={{ padding: '12px' }}>
-                    <button onClick={() => navigate(`/event/${ev.id}`)} style={{ marginRight: '8px', padding: '6px 10px', background: '#3498db', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>👁️</button>
+                    <button title={t('map_hint')} onClick={() => navigate(`/event/${ev.id}`)} style={{ marginRight: '8px', padding: '6px 10px', background: '#3498db', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>👁️</button>
                     <button onClick={() => navigate(`/edit-event/${ev.id}`)} style={{ marginRight: '8px', padding: '6px 10px', background: '#f39c12', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>✏️</button>
                     <button onClick={() => handleDelete(ev.id)} style={{ padding: '6px 10px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>🗑️</button>
                   </td>

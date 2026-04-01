@@ -27,7 +27,7 @@ function Refund() {
         }
       });
       
-      if (!res.ok) throw new Error('Failed to process refund');
+      if (!res.ok) throw new Error(t('refund_error'));
       
       alert(t('refund_request_sent'));
       navigate('/profile');

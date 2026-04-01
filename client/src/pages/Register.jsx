@@ -31,14 +31,14 @@ function Register({ setAuth }) {
       
       const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.message || 'Ошибка регистрации');
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setAuth(true);
+        navigate('/');
+      } else {
+        setError(t(data.message) || data.message);
       }
-      
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setAuth(true);
-      navigate('/');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -85,7 +85,7 @@ function Register({ setAuth }) {
           </button>
         </form>
         <p style={{textAlign: 'center', marginTop: '20px', fontSize: '14px'}}>
-          {t('reset_pass_success').split(' ')[2]}? <Link to="/login" style={{color: 'var(--primary)', fontWeight: 'bold'}}>{t('login')}</Link>
+          {t('already_registered')} <Link to="/login" style={{color: 'var(--primary)', fontWeight: 'bold'}}>{t('login')}</Link>
         </p>
       </div>
     </div>

@@ -26,10 +26,11 @@ function ForgotPassword() {
             });
             const data = await res.json();
             if (res.ok) {
-                setMessage(t('forgot_pass_success') || data.message);
+                setMessage(t(data.message) || data.message);
+                setEmail('');
                 if (data.testUrl) setTestUrl(data.testUrl);
             } else {
-                setError(data.message);
+                setError(t(data.message) || data.message);
             }
         } catch (err) {
             setError(t('server_error'));

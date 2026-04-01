@@ -16,7 +16,7 @@ function Login({ setAuth }) {
     setError('');
 
     if (!email || !password) {
-      setError('Заполните все поля');
+      setError(t('fill_all_fields'));
       return;
     }
 
@@ -30,14 +30,14 @@ function Login({ setAuth }) {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Ошибка входа');
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setAuth(true);
+        navigate('/');
+      } else {
+        setError(t(data.message) || data.message);
       }
-
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setAuth(true);
-      navigate('/');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -65,7 +65,7 @@ function Login({ setAuth }) {
             <input
               type="password"
               className="input-field"
-              placeholder="Пароль"
+              placeholder={t('password_placeholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -80,7 +80,7 @@ function Login({ setAuth }) {
           </button>
         </form>
         <p style={{ marginTop: '25px', color: 'var(--text-muted)' }}>
-          {t('no_saved').split(' ')[0]} {t('page_not_found').split(' ')[0]}? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: 'bold', textDecoration: 'none' }}>{t('register')}</Link>
+          {t('not_registered_yet')} <Link to="/register" style={{ color: 'var(--primary)', fontWeight: 'bold', textDecoration: 'none' }}>{t('register')}</Link>
         </p>
       </div>
     </div>

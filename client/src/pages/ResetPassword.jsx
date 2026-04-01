@@ -33,10 +33,10 @@ function ResetPassword() {
             });
             const data = await res.json();
             if (res.ok) {
-                setMessage(t('reset_pass_success') || data.message);
+                setMessage(t(data.message) || data.message);
                 setTimeout(() => navigate('/login'), 3000);
             } else {
-                setError(data.message);
+                setError(t(data.message) || data.message);
             }
         } catch (err) {
             setError(t('server_error'));

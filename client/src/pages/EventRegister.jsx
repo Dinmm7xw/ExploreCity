@@ -98,9 +98,9 @@ function EventRegister() {
             });
             
             const data = await res.json();
-            if (!res.ok) throw new Error(data.message);
+            if (!res.ok) throw new Error(t(data.message) || data.message);
             
-            alert(t('payment_success'));
+            alert(t(data.message) || data.message);
             navigate(`/event/${id}`);
           } catch (err) {
             setError(err.message);
@@ -150,13 +150,13 @@ function EventRegister() {
                                 <rect x="75" y="55" width="90" height="50" fill="none" stroke="white" strokeWidth="0.5" />
                                 <circle cx="120" cy="80" r="10" fill="none" stroke="white" strokeWidth="0.5" />
                                 <path d="M50,15 L190,15 L170,45 L70,45 Z" fill={activeSector?.startsWith('W') ? 'var(--primary)' : '#ff6b6b'} onClick={() => setActiveSector('W-Sector')} />
-                                <text x="120" y="32" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold">WEST (W1-W9)</text>
+                                <text x="120" y="32" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold">${t('west')} (W1-W9)</text>
                                 <path d="M50,145 L190,145 L170,115 L70,115 Z" fill={activeSector?.startsWith('E') ? 'var(--primary)' : '#ff6b6b'} onClick={() => setActiveSector('E-Sector')} />
-                                <text x="120" y="132" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold">EAST (E1-E9)</text>
+                                <text x="120" y="132" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold">${t('east')} (E1-E9)</text>
                                 <path d="M15,40 L45,55 L45,105 L15,120 Z" fill={activeSector?.startsWith('S') ? 'var(--primary)' : '#ff6b6b'} onClick={() => setActiveSector('S-Sector')} />
-                                <text x="30" y="80" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold" transform="rotate(-90, 30, 80)">SOUTH (S1-S7)</text>
+                                <text x="30" y="80" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold" transform="rotate(-90, 30, 80)">${t('south')} (S1-S7)</text>
                                 <path d="M225,40 L195,55 L195,105 L225,120 Z" fill={activeSector?.startsWith('N') ? 'var(--primary)' : '#ff6b6b'} onClick={() => setActiveSector('N-Sector')} />
-                                <text x="210" y="80" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold" transform="rotate(90, 210, 80)">NORTH (N1-N7)</text>
+                                <text x="210" y="80" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold" transform="rotate(90, 210, 80)">${t('north')} (N1-N7)</text>
                             </svg>
                         </div>
 
@@ -246,7 +246,7 @@ function EventRegister() {
                         <div style={{ display: 'grid', gap: '15px' }}>
                             <input type="text" className="input-field" placeholder="0000 0000 0000 0000" />
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                <input type="text" className="input-field" placeholder="ММ / ГГ" />
+                                <input type="text" className="input-field" placeholder={t('expiry_placeholder')} />
                                 <input type="text" className="input-field" placeholder="CVC" />
                             </div>
                             <p style={{ fontSize: '11px', color: '#999', textAlign: 'center' }}>{t('ssl_hint')}</p>
