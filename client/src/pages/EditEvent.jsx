@@ -124,6 +124,8 @@ function EditEvent() {
         lng = parseFloat(parts[1]);
       }
       setFormData({...formData, coordinatesStr: value, latitude: isNaN(lat) ? '' : lat, longitude: isNaN(lng) ? '' : lng});
+    } else if (name === 'price') {
+      setFormData({...formData, [name]: parseInt(value) || 0});
     } else {
       setFormData({...formData, [name]: value});
     }
