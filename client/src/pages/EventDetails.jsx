@@ -14,6 +14,7 @@ function EventDetails({ isAuthenticated }) {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
   const [selectedSession, setSelectedSession] = useState(null);
+  const [isSaved, setIsSaved] = useState(false);
 
   const fetchEvent = useCallback(async () => {
     try {
@@ -35,6 +36,22 @@ function EventDetails({ isAuthenticated }) {
       if (res.ok) setReviews(await res.json());
     } catch (err) {
       console.error(err);
+    }
+  }, [id]);
+
+  const checkSaveStatus = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const res = await fetch(`${API_URL}/api/events/saved`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const savedEvents = await res.json();
+        setIsSaved(savedEvents.some(e => e.id.toString() === id.toString()));
+      }
+    } catch (err) {
+      console.error('Check Save Status Error:', err);
     }
   }, [id]);
 
@@ -94,11 +111,32 @@ function EventDetails({ isAuthenticated }) {
         });
       }
       await fetchReviews();
+      await checkSaveStatus();
       if (evt) await fetchWeather(evt);
       setLoading(false);
     };
     loadAll();
-  }, [id, fetchEvent, fetchReviews, fetchWeather]);
+  }, [id, fetchEvent, fetchReviews, fetchWeather, checkSaveStatus]);
+
+  const toggleSave = async () => {
+    if (!isAuthenticated) {
+      alert(t('please_login_to_save'));
+      return;
+    }
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/events/${id}/save`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setIsSaved(data.saved);
+      }
+    } catch (err) {
+      console.error('Toggle Save Error:', err);
+    }
+  };
 
   const handleDelete = async () => {
     if (!window.confirm(t('delete_confirm'))) return;
@@ -181,9 +219,30 @@ function EventDetails({ isAuthenticated }) {
               );
             }
           })()}
-          <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '10px', padding: '4px 8px', borderRadius: '20px', backdropFilter: 'blur(4px)' }}>
-            <i className="fas fa-robot"></i> {t('ai_generated')}
-          </div>
+          
+          <button 
+            onClick={toggleSave}
+            className="glass-card"
+            style={{ 
+              position: 'absolute', 
+              top: '20px', 
+              right: '20px', 
+              width: '50px', 
+              height: '50px', 
+              borderRadius: '50%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              border: 'none',
+              cursor: 'pointer',
+              zIndex: 10,
+              background: 'rgba(255,255,255,0.9)',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+              transition: '0.3s'
+            }}
+          >
+            <i className={isSaved ? "fas fa-heart" : "far fa-heart"} style={{ color: isSaved ? '#e74c3c' : '#333', fontSize: '24px' }}></i>
+          </button>
         </div>
         
         <div className="mobile-p-20" style={{ padding: '40px' }}>

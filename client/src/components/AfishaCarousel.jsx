@@ -6,20 +6,61 @@ import { useTranslation } from 'react-i18next';
 function AfishaCarousel() {
   const { t } = useTranslation();
   const [featured, setFeatured] = useState([]);
+  const [savedIds, setSavedIds] = useState([]);
+  const isAuthenticated = !!localStorage.getItem('token');
   
   useEffect(() => {
     fetch(`${API_URL}/api/events`)
       .then(res => res.json())
       .then(data => {
-        // Мы берем последние события (до 4 штук) и размножаем их, 
-        // чтобы сделать крутую анимацию "бесконечной бегущей строки" (Marquee)
         const items = data.slice(0, 4);
         if (items.length > 0) {
            setFeatured([...items, ...items, ...items, ...items]); 
         }
       })
       .catch(e => console.error(e));
+      
+    if (isAuthenticated) fetchSavedIds();
   }, []);
+
+  const fetchSavedIds = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/events/saved`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSavedIds(data.map(e => e.id));
+      }
+    } catch (err) {
+      console.error('Fetch saved error:', err);
+    }
+  };
+
+  const toggleSave = async (e, eventId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/events/${eventId}/save`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.saved) {
+          setSavedIds([...savedIds, eventId]);
+        } else {
+          setSavedIds(savedIds.filter(id => id !== eventId));
+        }
+      }
+    } catch (err) {
+      console.error('Toggle save error:', err);
+    }
+  };
 
   if (featured.length === 0) return null;
 
@@ -107,6 +148,30 @@ function AfishaCarousel() {
                         style={{ pointerEvents: 'none', transform: 'scale(1.5)' }}
                       ></iframe>
                     </div>
+                  )}
+                  {isAuthenticated && (
+                    <button 
+                      onClick={(e) => toggleSave(e, ev.id)}
+                      style={{
+                        position: 'absolute',
+                        top: '15px',
+                        right: '15px',
+                        background: 'rgba(255,255,255,0.9)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '40px',
+                        height: '40px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        zIndex: 10,
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                        transition: '0.3s'
+                      }}
+                    >
+                      <i className={savedIds.includes(ev.id) ? "fas fa-heart" : "far fa-heart"} style={{ color: savedIds.includes(ev.id) ? '#e74c3c' : '#333', fontSize: '20px' }}></i>
+                    </button>
                   )}
                   <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', padding: '40px 24px 30px', background: 'linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.4) 60%, transparent)', zIndex: 2 }}>
                   <span style={{ background: 'var(--primary)', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>{ev.date || t('coming_soon')}</span>

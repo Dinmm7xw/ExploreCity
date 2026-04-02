@@ -10,13 +10,55 @@ function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [savedIds, setSavedIds] = useState([]);
+  const isAuthenticated = !!localStorage.getItem('token');
   
   const cityQuery = searchParams.get('city') || 'All';
   const searchQuery = searchParams.get('search') || '';
 
   useEffect(() => {
     fetchEvents();
+    if (isAuthenticated) fetchSavedIds();
   }, [cityQuery]);
+
+  const fetchSavedIds = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/events/saved`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSavedIds(data.map(e => e.id));
+      }
+    } catch (err) {
+      console.error('Fetch saved error:', err);
+    }
+  };
+
+  const toggleSave = async (e, eventId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/events/${eventId}/save`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.saved) {
+          setSavedIds([...savedIds, eventId]);
+        } else {
+          setSavedIds(savedIds.filter(id => id !== eventId));
+        }
+      }
+    } catch (err) {
+      console.error('Toggle save error:', err);
+    }
+  };
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -108,6 +150,30 @@ function Events() {
                       </div>
                     )}
                     <div className="rating-badge" style={{ zIndex: 3 }}><i className="fas fa-star"></i> {ev.rating}</div>
+                    {isAuthenticated && (
+                      <button 
+                        onClick={(e) => toggleSave(e, ev.id)}
+                        style={{
+                          position: 'absolute',
+                          top: '10px',
+                          right: '10px',
+                          background: 'rgba(255,255,255,0.9)',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '35px',
+                          height: '35px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          zIndex: 10,
+                          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                          transition: '0.3s'
+                        }}
+                      >
+                        <i className={savedIds.includes(ev.id) ? "fas fa-heart" : "far fa-heart"} style={{ color: savedIds.includes(ev.id) ? '#e74c3c' : '#333', fontSize: '18px' }}></i>
+                      </button>
+                    )}
                 </div>
                 <div className="event-info">
                   <h3>{ev.title}</h3>
