@@ -29,6 +29,7 @@ function AddEvent() {
     latitude: 51.1082,
     longitude: 71.4024,
     coordinatesStr: '51.1082, 71.4024',
+    price: 5000,
     sessions: []
   });
 
@@ -183,6 +184,11 @@ function AddEvent() {
               <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('time_label')}</label>
               <input type="time" name="time" className="input-field" value={formData.time} onChange={handleChange} />
             </div>
+          </div>
+
+          <div>
+            <label style={{display:'block', marginBottom:'8px', fontWeight:'600'}}>{t('price_label')}</label>
+            <input type="number" name="price" className="input-field" value={formData.price} onChange={handleChange} placeholder={t('price_placeholder')} />
           </div>
 
           <div>

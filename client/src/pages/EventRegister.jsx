@@ -24,7 +24,7 @@ function EventRegister() {
   const [step, setStep] = useState(1); // 1 - Данные, 2 - Оплата
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const TICKET_PRICE = 5000; // Условная цена за один билет
+  const TICKET_PRICE = event?.price || 5000; // Динамикалық баға (базадан), болмаса 5000
   const totalPrice = (selectedSeats.length || formData.tickets) * TICKET_PRICE;
 
   useEffect(() => {

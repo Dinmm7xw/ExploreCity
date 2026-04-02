@@ -102,11 +102,14 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', requireAdmin, async (req, res) => {
   try {
-    const { title, description, date, time, location, city, category, image_url, rating, latitude, longitude, sessions } = req.body;
+    const { title, description, date, time, location, city, category, image_url, rating, latitude, longitude, sessions, price } = req.body;
+    
+    // Set default price if not provided
+    const eventPrice = price !== undefined ? price : 5000;
 
     const result = await pool.query(
-      'INSERT INTO events (title, description, date, time, location, city, category, image_url, author_id, rating, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id',
-      [title, description, date, time, location, city, category, image_url, req.user.id, rating || 5.0, latitude || null, longitude || null]
+      'INSERT INTO events (title, description, date, time, location, city, category, image_url, author_id, rating, latitude, longitude, price) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id',
+      [title, description, date, time, location, city, category, image_url, req.user.id, rating || 5.0, latitude || null, longitude || null, eventPrice]
     );
 
     const eventId = result.rows[0].id;
@@ -139,11 +142,11 @@ router.put('/:id', requireAuth, async (req, res) => {
       return res.status(403).json({ message: 'Нет доступа к редактированию' });
     }
 
-    const { title, description, date, time, location, city, category, image_url, latitude, longitude, sessions } = req.body;
+    const { title, description, date, time, location, city, category, image_url, latitude, longitude, sessions, price } = req.body;
 
     await pool.query(
-      'UPDATE events SET title = $1, description = $2, date = $3, time = $4, location = $5, city = $6, category = $7, image_url = $8, latitude = $9, longitude = $10 WHERE id = $11',
-      [title, description, date, time, location, city, category, image_url, latitude || null, longitude || null, req.params.id]
+      'UPDATE events SET title = $1, description = $2, date = $3, time = $4, location = $5, city = $6, category = $7, image_url = $8, latitude = $9, longitude = $10, price = $11 WHERE id = $12',
+      [title, description, date, time, location, city, category, image_url, latitude || null, longitude || null, price || 5000, req.params.id]
     );
 
     if (sessions && Array.isArray(sessions)) {
