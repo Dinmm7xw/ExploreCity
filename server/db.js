@@ -6,18 +6,18 @@ const { Pool } = pkg;
 
 // Настройка подключения к PostgreSQL
 const pool = new Pool(
-  process.env.DATABASE_URL 
-    ? { 
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false } // Требуется для облачных БД (Neon)
-      }
+  process.env.DATABASE_URL
+    ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false } // Требуется для облачных БД (Neon)
+    }
     : {
-        user: 'postgres',
-        host: 'localhost',
-        database: 'explorecity', 
-        password: '1234',
-        port: 5432,
-      }
+      user: 'postgres',
+      host: 'localhost',
+      database: 'explorecity',
+      password: '1234',
+      port: 5432,
+    }
 );
 
 export const initDb = async () => {
@@ -75,8 +75,7 @@ export const initDb = async () => {
       );
     `);
 
-    // 2. Миграции (добавление новых колонок в существующие таблицы)
-    // Добавляем category, если ее нет
+
     await pool.query(`
       DO $$ 
       BEGIN 
@@ -86,7 +85,7 @@ export const initDb = async () => {
       END $$;
     `);
 
-    // Добавляем rating, если его нет
+
     await pool.query(`
       DO $$ 
       BEGIN 
@@ -96,7 +95,7 @@ export const initDb = async () => {
       END $$;
     `);
 
-    // Добавляем author_id, если его нет
+
     await pool.query(`
       DO $$ 
       BEGIN 
@@ -106,7 +105,7 @@ export const initDb = async () => {
       END $$;
     `);
 
-    // Добавляем seats в event_registrations, если его нет
+
     await pool.query(`
       DO $$ 
       BEGIN 
@@ -116,7 +115,7 @@ export const initDb = async () => {
       END $$;
     `);
 
-    // Добавляем phone в event_registrations, если его нет
+
     await pool.query(`
       DO $$ 
       BEGIN 
@@ -135,7 +134,7 @@ export const initDb = async () => {
       END $$;
     `);
 
-    // Миграция для восстановления пароля
+
     await pool.query(`
       DO $$ 
       BEGIN 
@@ -148,7 +147,7 @@ export const initDb = async () => {
       END $$;
     `);
 
-    // Миграция для координат (Задача 3)
+
     await pool.query(`
       DO $$ 
       BEGIN 
@@ -164,7 +163,7 @@ export const initDb = async () => {
       END $$;
     `);
 
-    // Создание таблицы отзывов (Задача 4)
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS reviews (
         id SERIAL PRIMARY KEY,
@@ -176,7 +175,7 @@ export const initDb = async () => {
       );
     `);
 
-    // Миграция расписаний и сеансов (Мастер-событие)
+
     await pool.query(`
       DO $$ 
       BEGIN 
@@ -188,7 +187,7 @@ export const initDb = async () => {
 
     console.log('PostgreSQL (pgAdmin) Database tables initialized and migrated successfully.');
 
-    // Добавление тестовых данных
+
     const result = await pool.query('SELECT COUNT(*) FROM events');
     const count = parseInt(result.rows[0].count, 10);
 
