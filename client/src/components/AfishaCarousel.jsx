@@ -111,7 +111,16 @@ function AfishaCarousel() {
                   <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', padding: '40px 24px 30px', background: 'linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.4) 60%, transparent)', zIndex: 2 }}>
                   <span style={{ background: 'var(--primary)', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>{ev.date || t('coming_soon')}</span>
                   <h3 className="featured-title" style={{ fontSize: '26px', margin: '14px 0 8px', fontWeight: '800', color: 'white', lineHeight: '1.2' }}>{ev.title}</h3>
-                  <p style={{ fontSize: '15px', color: '#ddd' }}><i className="fas fa-location-dot"></i> {ev.city} • {ev.category}</p>
+                  <p style={{ fontSize: '15px', color: '#ddd' }}>
+                    <i className="fas fa-location-dot"></i> {(() => {
+                      const cities = new Set([ev.city]);
+                      if (ev.sessions) ev.sessions.forEach(s => cities.add(s.city));
+                      const citiesArr = Array.from(cities);
+                      return citiesArr.length > 2 
+                        ? `${citiesArr[0]}, ${citiesArr[1]} +${citiesArr.length - 2}`
+                        : citiesArr.join(', ');
+                    })()} • {ev.category}
+                  </p>
                 </div>
               </div>
             </Link>

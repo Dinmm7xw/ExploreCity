@@ -113,7 +113,16 @@ function Events() {
                   <h3>{ev.title}</h3>
                   <div className="event-meta">
                     <span><i className="fas fa-tag"></i> {ev.category}</span>
-                    <span><i className="fas fa-location-dot"></i> {ev.city}</span>
+                    <span>
+                      <i className="fas fa-location-dot"></i> {(() => {
+                        const cities = new Set([ev.city]);
+                        if (ev.sessions) ev.sessions.forEach(s => cities.add(s.city));
+                        const citiesArr = Array.from(cities);
+                        return citiesArr.length > 2 
+                          ? `${citiesArr[0]}, ${citiesArr[1]} +${citiesArr.length - 2}`
+                          : citiesArr.join(', ');
+                      })()}
+                    </span>
                   </div>
                   {ev.date && (
                     <div className="event-datetime">
