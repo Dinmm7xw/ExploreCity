@@ -144,8 +144,8 @@ function EventDetails({ isAuthenticated }) {
   };
 
   if (loading) return <div className="container" style={{padding:'100px', textAlign:'center'}}><div className="spinner"></div></div>;
-  if (error) return <div className="container" style={{padding:'100px', textAlign:'center'}}><div className="glass-card" style={{padding:'40px'}}><h2 style={{color:'red'}}>{error}</h2><button className="btn-primary" style={{marginTop:'20px'}} onClick={() => navigate('/events')}>{t('back_to_home')}</button></div></div>;
-  if (!event) return <div className="container" style={{padding:'100px', textAlign:'center'}}><h2>{t('no_events_found')}</h2></div>;
+  if (error) return <div className="container" style={{padding:'60px 20px', textAlign:'center'}}><div className="glass-card" style={{padding:'40px'}}><h2 style={{color:'red'}}>{error}</h2><button className="btn-primary" style={{marginTop:'20px'}} onClick={() => navigate('/events')}>{t('back_to_home')}</button></div></div>;
+  if (!event) return <div className="container" style={{padding:'60px 20px', textAlign:'center'}}><h2>{t('no_events_found')}</h2></div>;
 
   const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
   const canModify = user && user.role === 'admin';
@@ -188,26 +188,28 @@ function EventDetails({ isAuthenticated }) {
         
         <div className="mobile-p-20" style={{ padding: '40px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
-            <div style={{ flex: 1 }}>
-              <h1 style={{ fontSize: '36px', marginBottom: '16px', color: 'var(--text-main)' }}>{event.title}</h1>
-              <div className="stack-mobile" style={{ display: 'flex', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
-                <span style={{background: 'rgba(193, 123, 76, 0.1)', padding: '8px 16px', borderRadius: '20px', color: 'var(--primary)', fontWeight: 'bold'}}><i className="fas fa-tag"></i> {event.category}</span>
-                <span style={{background: '#ffd966', padding: '8px 16px', borderRadius: '20px', color: '#000', fontWeight: 'bold'}}><i className="fas fa-star"></i> {event.rating}</span>
+            <div style={{ flex: 1, minWidth: '280px' }}>
+              <h1 className="event-title-main" style={{ fontSize: '36px', marginBottom: '16px', color: 'var(--text-main)' }}>{event.title}</h1>
+              <div className="stack-mobile" style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                <span style={{background: 'rgba(193, 123, 76, 0.1)', padding: '8px 16px', borderRadius: '20px', color: 'var(--primary)', fontWeight: 'bold', fontSize: '14px'}}><i className="fas fa-tag"></i> {event.category}</span>
+                <span style={{background: '#ffd966', padding: '8px 16px', borderRadius: '20px', color: '#000', fontWeight: 'bold', fontSize: '14px'}}><i className="fas fa-star"></i> {event.rating}</span>
                 {weather && (
-                  <span style={{background: 'rgba(52, 152, 219, 0.1)', padding: '8px 16px', borderRadius: '20px', color: '#2980b9', fontWeight: 'bold'}}>
+                  <span style={{background: 'rgba(52, 152, 219, 0.1)', padding: '8px 16px', borderRadius: '20px', color: '#2980b9', fontWeight: 'bold', fontSize: '14px'}}>
                     <i className={weather.code <= 3 ? "fas fa-sun" : "fas fa-cloud"}></i> {weather.temp}°C
                   </span>
                 )}
               </div>
             </div>
             {isAuthenticated && (
-              <button 
-                className="btn-primary" 
-                style={{ background: '#2ecc71', color: 'white', padding: '15px 30px' }} 
-                onClick={() => navigate(selectedSession && selectedSession.id !== 'master' ? `/event/${id}/register?session=${selectedSession.id}` : `/event/${id}/register`)}
-              >
-                <i className="fas fa-ticket-alt"></i> {t('book_ticket')}
-              </button>
+              <div className="mobile-w-100" style={{ width: 'auto' }}>
+                <button 
+                  className="btn-primary" 
+                  style={{ background: '#2ecc71', color: 'white', padding: '15px 30px', width: '100%', justifyContent: 'center' }} 
+                  onClick={() => navigate(selectedSession && selectedSession.id !== 'master' ? `/event/${id}/register?session=${selectedSession.id}` : `/event/${id}/register`)}
+                >
+                  <i className="fas fa-ticket-alt"></i> {t('book_ticket')}
+                </button>
+              </div>
             )}
           </div>
 

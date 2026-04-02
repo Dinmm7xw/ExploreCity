@@ -31,26 +31,25 @@ function Home() {
 
       {/* 2. Поиск */}
       <div className="container" style={{ marginTop: '20px', marginBottom: '60px' }}>
-        <div className="glass-card" style={{ display: 'flex', gap: '20px', alignItems: 'center', background: 'white', padding: '12px', borderRadius: '20px', boxShadow: '0 15px 40px rgba(0,0,0,0.06)' }}>
-          <div style={{ flex: 2, display: 'flex', alignItems: 'center', padding: '10px 20px', background: '#f8f9fa', borderRadius: '16px' }}>
-            <i className="fas fa-search" style={{ color: 'var(--text-muted)', fontSize: '20px', marginRight: '15px' }}></i>
+        <div className="search-card glass-card">
+          <div className="search-input-area">
+            <i className="fas fa-search"></i>
             <input 
               type="text" 
               placeholder={t('search_placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: '16px', fontWeight: '600' }}
             />
           </div>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '10px 20px', background: '#f8f9fa', borderRadius: '16px' }}>
-            <i className="fas fa-map-marker-alt" style={{ color: 'var(--primary)', fontSize: '20px', marginRight: '15px' }}></i>
-            <select value={city} onChange={(e) => setCity(e.target.value)} style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>
+          <div className="city-divider">
+            <i className="fas fa-map-marker-alt"></i>
+            <select value={city} onChange={(e) => setCity(e.target.value)}>
               {["Astana", "Almaty", "Shymkent", "Karaganda", "Aktobe", "Taraz", "Pavlodar", "Oskemen", "Semey", "Atyrau", "Kyzylorda", "Kostanay", "Oral", "Petropavl", "Aktau", "Turkistan", "Kokshetau", "Taldykorgan", "Zhezkazgan"].sort().map(c => <option key={c} value={c}>{t(c)}</option>)}
               <option value="All">{t('all_cities')}</option>
             </select>
           </div>
-          <button className="btn-primary" onClick={handleSearch} style={{ padding: '20px 40px', fontSize: '18px', borderRadius: '16px', height: '100%' }}>
+          <button className="btn-primary search-button" onClick={handleSearch}>
             {t('search_btn')}
           </button>
         </div>

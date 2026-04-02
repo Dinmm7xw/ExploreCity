@@ -94,6 +94,11 @@
 }
 
 @media (max-width: 992px) {
+  .header-content {
+    padding: 0 20px;
+    height: 70px;
+  }
+  
   .mobile-menu-btn {
     display: block;
   }
